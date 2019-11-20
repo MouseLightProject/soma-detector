@@ -1,0 +1,3 @@
+[submodule "mouselight_toolbox"]
+	path = mouselight_toolbox
+	url = https://github.com/MouseLightProject/mouselight_toolbox
