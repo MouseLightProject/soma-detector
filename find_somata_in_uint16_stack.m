@@ -1,13 +1,13 @@
-function result = find_somata_in_uint16_stack(stack_yxz, spacing_xyz, x_grid_yxz, y_grid_yxz, z_grid_yxz)
-    intensity_threshold = 0.8 * 2^16 ;
-%     minSize = 800; //1500
-%     maxSize = minSize * 5;
+function result = find_somata_in_uint16_stack(stack_yxz, origin_xyz, spacing_xyz, parameters)    
+    % Unpack parameters            
+    intensity_threshold = parameters.intensity_threshold ;
+    minimum_volume = parameters.minimum_volume ;
+    maximum_volume = parameters.maximum_volume ;
+    maximum_condition_number = parameters.maximum_condition_number ;
     
-    minimum_volume = 3000 ;  % um^3
-    maximum_volume = 5*minimum_volume ;  % um^3
     volume_per_voxel = prod(spacing_xyz) ;
-    minimum_volume_in_voxels = minimum_volume / volume_per_voxel 
-    maximum_volume_in_voxels = maximum_volume / volume_per_voxel 
+    minimum_volume_in_voxels = minimum_volume / volume_per_voxel ;
+    maximum_volume_in_voxels = maximum_volume / volume_per_voxel ;
     
     is_bright_enough = logical(stack_yxz>intensity_threshold) ;
     [label_stack_yxz, component_count] = bwlabeln(is_bright_enough) ;
@@ -15,6 +15,16 @@ function result = find_somata_in_uint16_stack(stack_yxz, spacing_xyz, x_grid_yxz
     %stats = regionprops3(label_stack_yxz, {'Volume', 'Centroid',
     %'EigenValues'}) ;  % not sure how to use in presence of anisotropy
         
+    % Create grids
+    stack_shape_jik = size(stack_yxz) ;
+    stack_shape_ijk = stack_shape_jik([2 1 3]) ;   
+    x_line = origin_xyz(1) + spacing_xyz(1) * (0:(stack_shape_ijk(1)-1)) ;
+    x_grid_yxz = repmat(x_line, [stack_shape_ijk(2) 1 stack_shape_ijk(3)]) ;
+    y_line = origin_xyz(2) + spacing_xyz(2) * (0:(stack_shape_ijk(2)-1))' ;
+    y_grid_yxz = repmat(y_line, [1 stack_shape_ijk(1) stack_shape_ijk(3)]) ;
+    z_line = origin_xyz(3) + spacing_xyz(3) * reshape(0:(stack_shape_ijk(3)-1), [1 1 stack_shape_ijk(3)]) ;
+    z_grid_yxz = repmat(z_line, [stack_shape_ijk(2) stack_shape_ijk(1) 1]) ;
+    
     voxel_count_from_label = nan(1, component_count) ;
     condition_number_from_label = nan(1, component_count) ;
     soma_centroid_xyz = nan(component_count, 3) ;
@@ -35,9 +45,9 @@ function result = find_somata_in_uint16_stack(stack_yxz, spacing_xyz, x_grid_yxz
 %             [~, Lambda] = eig(Sigma) ;
 %             lambda = diag(Lambda) ;
 %             k_maybe = lambda(end)/lambda(1) 
-            condition_number = cond(Sigma) 
+            condition_number = cond(Sigma) ;
             condition_number_from_label(label) = condition_number ;
-            if condition_number < 5 ,
+            if condition_number < maximum_condition_number ,
                 is_soma(label) = true ;
             end
         end
