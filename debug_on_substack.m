@@ -51,29 +51,37 @@ padded_substack_yxz = ...
 substack_mip = max(padded_substack_yxz,[], 3) ;
 
 intensity_threshold = 0.8 * 2^16 ;
-minimum_volume = 600 ;  % um^3
+minimum_volume = 500 ;  % um^3
 maximum_volume = 15000 ;  % um^3
-maximum_condition_number = 5 ;
+maximum_sqrt_condition_number = 5 ;
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
                     'maximum_volume', {maximum_volume}, ...
-                    'maximum_sqrt_condition_number', maximum_condition_number) ;
+                    'maximum_sqrt_condition_number', maximum_sqrt_condition_number) ;
 
 [voxel_count_from_label, ...
  component_centroid_xyz_from_label, ...
  sqrt_condition_number_from_label, ...
- max_intensity_from_label, ...
- is_putative_soma_from_label, ...
- is_in_bbox_from_label] = ... 
-    find_somata_in_uint16_stack(padded_substack_yxz, ...
-                                padded_substack_origin_xyz, ...
-                                spacing_at_zoom_level_xyz, ...
-                                substack_origin_xyz, ...
-                                substack_shape_xyz, ...
-                                parameters) ;
-        % these are in the coordinate system of the full stack
-        
-putative_somata_xyzs = component_centroid_xyz_from_label(is_putative_soma_from_label & is_in_bbox_from_label, :) ;    
+ max_intensity_from_label] = ... 
+    compute_somalike_features_in_uint16_stack(...
+        padded_substack_yxz, ...
+        padded_substack_origin_xyz, ...
+        spacing_at_zoom_level_xyz, ...
+        substack_origin_xyz, ...
+        substack_shape_xyz, ...
+        parameters) ;
+        % these are in the coordinate system of the full stack        
+component_count = length(voxel_count_from_label) ;
+
+volume_per_voxel = prod(spacing_at_zoom_level_xyz) ;
+minimum_volume_in_voxels = minimum_volume / volume_per_voxel
+maximum_volume_in_voxels = maximum_volume / volume_per_voxel
+
+is_putative_soma_from_label = ...
+    (minimum_volume_in_voxels < voxel_count_from_label) & ...
+    (voxel_count_from_label < maximum_volume_in_voxels) & ...
+    sqrt_condition_number_from_label < maximum_sqrt_condition_number ;
+putative_somata_xyzs = component_centroid_xyz_from_label(is_putative_soma_from_label, :) ;    
         
 % f = figure('color', 'w') ;
 % a = axes(f, 'YDir', 'reverse') ;
@@ -100,17 +108,17 @@ putative_somata_xyzs = component_centroid_xyz_from_label(is_putative_soma_from_l
 % end
 % hold off ; 
 
-miss_1_xy = [74096.2049 18331.3971]  % location of a component centroid that is *not* classified as a soma, but should be
-distance_to_miss_1_xy = sqrt(sum((component_centroid_xyz_from_label(:,1:2) - miss_1_xy).^2,2)) ;
-[distance_from_miss_1_to_nearest_component_in_xy, label_of_miss_1] = min(distance_to_miss_1_xy)
-
-centroid_xyz_of_miss_1 = component_centroid_xyz_from_label(label_of_miss_1, :)
-voxel_count_of_miss_1 = voxel_count_from_label(label_of_miss_1) 
-sqrt_condition_number_of_miss_1 = sqrt_condition_number_from_label(label_of_miss_1)
-is_putative_soma_for_miss_1 = is_putative_soma_from_label(label_of_miss_1)
-max_intesity_for_miss_1 = max_intensity_from_label(label_of_miss_1)
-% sqrt condition number is 2.6, voxel_count is 556, which just clears the
-% current minimum (515)
+% miss_1_xy = [74096.2049 18331.3971]  % location of a component centroid that is *not* classified as a soma, but should be
+% distance_to_miss_1_xy = sqrt(sum((component_centroid_xyz_from_label(:,1:2) - miss_1_xy).^2,2)) ;
+% [distance_from_miss_1_to_nearest_component_in_xy, label_of_miss_1] = min(distance_to_miss_1_xy)
+% 
+% centroid_xyz_of_miss_1 = component_centroid_xyz_from_label(label_of_miss_1, :)
+% voxel_count_of_miss_1 = voxel_count_from_label(label_of_miss_1) 
+% sqrt_condition_number_of_miss_1 = sqrt_condition_number_from_label(label_of_miss_1)
+% is_putative_soma_for_miss_1 = is_putative_soma_from_label(label_of_miss_1)
+% max_intesity_for_miss_1 = max_intensity_from_label(label_of_miss_1)
+% % sqrt condition number is 2.6, voxel_count is 556, which just clears the
+% % current minimum (515)
 
 %%
 % Load the ground-truth
@@ -176,22 +184,8 @@ sqrt_condition_number_from_target_index(~is_there_a_nearby_component_from_target
 max_intensity_from_target_index = max_intensity_from_label(label_from_target_index) ;
 max_intensity_from_target_index(~is_there_a_nearby_component_from_target_index) = 0 ;
 
-% Examine location that looks like a miss to me
-component_centroid_xyz_nearest_to_miss_1 = component_centroid_xyz_from_label(label_of_miss_1, :) 
-distance_to_miss_1_xy_from_target_index = sqrt(sum((xyz_from_target_index - component_centroid_xyz_nearest_to_miss_1).^2,2)) ;
-[distance_from_miss_1_to_nearest_target, index_of_target_nearest_miss_1] = min(distance_to_miss_1_xy_from_target_index)
-xyz_of_miss_1 = xyz_from_target_index(index_of_target_nearest_miss_1, :)
-% xyz_of_miss_1 =
-% 
-%                74097.71186              18330.989846              36487.417253
-
-% The distance to the nearest target is ~2 um, so that's a good match,
-% seemingly
-
-% OK, so I think we understand this miss.
 
 % Plot each target, and its nearest component centroid
-
 f = figure('color', 'w', 'name', 'targets-and-their-matches') ;
 a = axes(f, 'YDir', 'reverse') ;
 image(a, 'CData', substack_mip, ...
@@ -268,7 +262,5 @@ legend(handles, legend_labels, 'Location', 'northwest') ;
 axis vis3d
 grid on
 camproj perspective
-
-xyz_from_target_index(is_miss,:)
 
 
