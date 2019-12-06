@@ -51,8 +51,8 @@ padded_substack_yxz = ...
 substack_mip = max(padded_substack_yxz,[], 3) ;
 
 intensity_threshold = 0.8 * 2^16 ;
-minimum_volume = 3000 ;  % um^3
-maximum_volume = 5*minimum_volume ;  % um^3
+minimum_volume = 600 ;  % um^3
+maximum_volume = 15000 ;  % um^3
 maximum_condition_number = 5 ;
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
@@ -75,30 +75,30 @@ parameters = struct('intensity_threshold', {intensity_threshold}, ...
         
 putative_somata_xyzs = component_centroid_xyz_from_label(is_putative_soma_from_label & is_in_bbox_from_label, :) ;    
         
-f = figure('color', 'w') ;
-a = axes(f, 'YDir', 'reverse') ;
-image(a, 'CData', substack_mip, ...
-         'XData', [padded_substack_origin_xyz(1) padded_substack_far_corner_xyz(1)], ...
-         'YData', [padded_substack_origin_xyz(2) padded_substack_far_corner_xyz(2)], ...
-         'CDataMapping', 'scaled') ;         
-colormap(gray(256)) ;
-axis image
-
-hold on ;
-component_count = size(component_centroid_xyz_from_label,1) ;
-for i = 1 : component_count ,
-    centroid_xyz = component_centroid_xyz_from_label(i,:) ;
-    plot(centroid_xyz(1), centroid_xyz(2), '+', 'Color', [0 0.5 1]) ;    
-end
-hold off ; 
-
-hold on ;
-somata_count = size(putative_somata_xyzs,1) ;
-for i = 1 : somata_count ,
-    soma_xyz = putative_somata_xyzs(i,:) ;
-    plot(soma_xyz(1), soma_xyz(2), 'r+') ;    
-end
-hold off ; 
+% f = figure('color', 'w') ;
+% a = axes(f, 'YDir', 'reverse') ;
+% image(a, 'CData', substack_mip, ...
+%          'XData', [padded_substack_origin_xyz(1) padded_substack_far_corner_xyz(1)], ...
+%          'YData', [padded_substack_origin_xyz(2) padded_substack_far_corner_xyz(2)], ...
+%          'CDataMapping', 'scaled') ;         
+% colormap(gray(256)) ;
+% axis image
+% 
+% hold on ;
+% component_count = size(component_centroid_xyz_from_label,1) ;
+% for i = 1 : component_count ,
+%     centroid_xyz = component_centroid_xyz_from_label(i,:) ;
+%     plot(centroid_xyz(1), centroid_xyz(2), '+', 'Color', [0 0.5 1]) ;    
+% end
+% hold off ; 
+% 
+% hold on ;
+% somata_count = size(putative_somata_xyzs,1) ;
+% for i = 1 : somata_count ,
+%     soma_xyz = putative_somata_xyzs(i,:) ;
+%     plot(soma_xyz(1), soma_xyz(2), 'r+') ;    
+% end
+% hold off ; 
 
 miss_1_xy = [74096.2049 18331.3971]  % location of a component centroid that is *not* classified as a soma, but should be
 distance_to_miss_1_xy = sqrt(sum((component_centroid_xyz_from_label(:,1:2) - miss_1_xy).^2,2)) ;
@@ -165,9 +165,16 @@ miss_rate = miss_count / positive_count
 chase_rate = chase_count / negative_count
 ball_rate  = ball_count / negative_count
 
+
+% Get the feature values for the component matching each target
 voxel_count_from_target_index = voxel_count_from_label(label_from_target_index) ;
+voxel_count_from_target_index(~is_there_a_nearby_component_from_target_index) = 0 ;
+
 sqrt_condition_number_from_target_index = sqrt_condition_number_from_label(label_from_target_index) ;
+sqrt_condition_number_from_target_index(~is_there_a_nearby_component_from_target_index) = 1 ;
+
 max_intensity_from_target_index = max_intensity_from_label(label_from_target_index) ;
+max_intensity_from_target_index(~is_there_a_nearby_component_from_target_index) = 0 ;
 
 % Examine location that looks like a miss to me
 component_centroid_xyz_nearest_to_miss_1 = component_centroid_xyz_from_label(label_of_miss_1, :) 
@@ -200,7 +207,7 @@ for target_index = 1 : target_count ,
     target_xyz = xyz_from_target_index(target_index,:) ;
     marker = fif(is_soma_from_target_index(target_index), '+', 'o') ;
     marker_color = fif(is_soma_from_target_index(target_index), [0 0.5 1], [1 0 0]) ;
-    plot(target_xyz(1), target_xyz(2), 'Marker', marker, 'Color', marker_color) ;    
+    plot(target_xyz(1), target_xyz(2), 'Marker', marker, 'Color', marker_color) ;            
     if is_there_a_nearby_component_from_target_index(target_index) ,
         label = label_from_target_index(target_index) ;
         component_xyz = component_centroid_xyz_from_label(label,:) ;
@@ -259,4 +266,9 @@ end
 
 legend(handles, legend_labels, 'Location', 'northwest') ;
 axis vis3d
+grid on
+camproj perspective
+
+xyz_from_target_index(is_miss,:)
+
 
