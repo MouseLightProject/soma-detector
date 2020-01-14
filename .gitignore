@@ -6,3 +6,5 @@
 *.pdf
 auto-somata
 2019-10-04_adam_AT
+2019-10-04-somata-gt-*
+find-somata*.stdouterr.txt

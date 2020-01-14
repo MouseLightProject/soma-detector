@@ -1,16 +1,20 @@
+close all ;
+clear ;
+
 sample_date = '2019-10-04' ;
 rendered_folder_path = sprintf('/nrs/mouselight/SAMPLES/%s', sample_date) ;
 gfp_channel_index = 0 ;
+background_channel_index = 1 ;
 zoom_level = 4 ;  % The zoom level of the tiles we will analyze
 pad_depth_in_um = 50 ; % um
 intensity_threshold = 0.8 * 2^16 ;
-minimum_volume = 3000 ;  % um^3
-maximum_volume = 5*minimum_volume ;  % um^3
-maximum_condition_number = 5 ;
+minimum_volume = 500 ;  % um^3
+maximum_volume = 15000 ;  % um^3
+maximum_sqrt_condition_number = 10 ;
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
                     'maximum_volume', {maximum_volume}, ...
-                    'maximum_condition_number', maximum_condition_number) ;
+                    'maximum_sqrt_condition_number', maximum_sqrt_condition_number) ;
                 
 this_file_path = mfilename('fullpath') ;
 this_folder_path = fileparts(this_file_path) ;                
@@ -39,11 +43,15 @@ chunks_per_dimension_ijk = stack_shape_ijk ./ analysis_chunk_shape_ijk ;
 if ~exist(somata_folder_path, 'file') ,
     mkdir(somata_folder_path) ;
 end
+chunks_folder_path = fullfile(somata_folder_path, 'chunks') ;
+if ~exist(chunks_folder_path, 'file') ,
+    mkdir(chunks_folder_path) ;
+end
 for chunk_i = 1 : chunks_per_dimension_ijk(1) ,
     for chunk_j = 1 : chunks_per_dimension_ijk(2) ,
         for chunk_k = 1 : chunks_per_dimension_ijk(3) ,
             somata_mat_file_name = sprintf('somata-for-chunk-%d-%d-%d.mat', chunk_i, chunk_j, chunk_k) ;
-            somata_mat_file_path = fullfile(somata_folder_path, 'chunks', somata_mat_file_name) ;
+            somata_mat_file_path = fullfile(chunks_folder_path, somata_mat_file_name) ;
             chunk_offset_within_chunks_ijk1 = [chunk_i chunk_j chunk_k] 
             chunk_offset_within_stack_ijk1 = (chunk_offset_within_chunks_ijk1-1) .* analysis_chunk_shape_ijk + 1 ;
             tic_id = tic() ;
@@ -67,12 +75,12 @@ end
 soma_mat_file_name_template = fullfile(somata_folder_path, 'somata-for-chunk-*.mat') ;
 soma_mat_file_names = simple_dir(soma_mat_file_name_template) ;
 somata_file_count = length(soma_mat_file_names) ;
-somata_xyzs = zeros(0,3) ;
+xyz_from_guess_index = zeros(0,3) ;
 for i = 1 : somata_file_count ,
     somata_mat_file_name = soma_mat_file_names{i} ;
     somata_mat_file_path = fullfile(somata_folder_path, somata_mat_file_name) ;
-    somata_xyzs_from_this_file = load_anonymous(somata_mat_file_path) ;
-    somata_xyzs = vertcat(somata_xyzs, somata_xyzs_from_this_file) ;  %#ok<AGROW>
+    s = load(somata_mat_file_path) ;    
+    xyz_from_guess_index = vertcat(xyz_from_guess_index, s.xyz_from_guess_index) ;  %#ok<AGROW>
 end
 
 %%
@@ -81,25 +89,25 @@ forest_name = sprintf('%s-auto-somata', sample_date) ;
 forest_color = [1 0 0] ;
 swc_file_name = horzcat(forest_name, '.swc') ;
 swc_file_path = fullfile(somata_folder_path, swc_file_name) ;
-save_somata_as_single_swc(swc_file_path, somata_xyzs, forest_name, forest_color) ;
+save_somata_as_single_swc(swc_file_path, xyz_from_guess_index, forest_name, forest_color) ;
 
 
-%%
-% Calculate distances between all pairs
-soma_count = size(somata_xyzs, 1) ;
-distance_between_somata = zeros(soma_count*(soma_count-1)/2, 3) ;
-k = 1 ;
-for i = 1 : soma_count ,
-    soma_i_xyz = somata_xyzs(i,:) ;
-    for j = i+1 : soma_count ,
-        soma_j_xyz = somata_xyzs(j,:) ;
-        distance = sqrt(sum((soma_j_xyz - soma_i_xyz).^2)) ;
-        distance_between_somata(k,:) = [i j distance] ;        
-        k = k + 1 ;
-    end
-end
-
-[~, k_sorted] = sort(distance_between_somata(:,3))
-sorted_distance_between_somata = distance_between_somata(k_sorted,:)
-
-
+% %%
+% % Calculate distances between all pairs
+% soma_count = size(xyz_from_guess_index, 1) ;
+% distance_between_somata = zeros(soma_count*(soma_count-1)/2, 3) ;
+% k = 1 ;
+% for i = 1 : soma_count ,
+%     soma_i_xyz = xyz_from_guess_index(i,:) ;
+%     for j = i+1 : soma_count ,
+%         soma_j_xyz = xyz_from_guess_index(j,:) ;
+%         distance = sqrt(sum((soma_j_xyz - soma_i_xyz).^2)) ;
+%         distance_between_somata(k,:) = [i j distance] ;        
+%         k = k + 1 ;
+%     end
+% end
+% 
+% [~, k_sorted] = sort(distance_between_somata(:,3))
+% sorted_distance_between_somata = distance_between_somata(k_sorted,:)
+% 
+% 

@@ -1,7 +1,7 @@
 function [target_xyzs, is_target_a_soma] = load_targets()
     this_file_path = mfilename('fullpath') ;
     this_folder_path = fileparts(this_file_path) ;
-    swc_folder_path = fullfile(this_folder_path, '2019-10-04_adam_AT') ;
+    swc_folder_path = fullfile(this_folder_path, '2019-10-04-somata-gt-round-2') ;
 
     soma_swc_file_name_template = 'Neuron*.swc' ;
     soma_xyzs = load_somata_xyzs_from_swc_files(swc_folder_path, soma_swc_file_name_template) ;

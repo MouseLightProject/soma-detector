@@ -194,6 +194,8 @@ image(a, 'CData', substack_mip, ...
          'CDataMapping', 'scaled') ;         
 colormap(gray(256)) ;
 axis image
+xlabel('x (um)') ;
+ylabel('y (um)') ;
 
 % plot each target, and its matching component if there was one
 hold on ;

@@ -22,7 +22,7 @@ function [voxel_count_from_label, ...
     %maximum_sqrt_condition_number = parameters.maximum_sqrt_condition_number ;
     
     volume_per_voxel = prod(spacing_xyz) ;
-    minimum_volume_in_voxels = minimum_volume / volume_per_voxel 
+    minimum_volume_in_voxels = minimum_volume / volume_per_voxel ;
     %maximum_volume_in_voxels = maximum_volume / volume_per_voxel 
     
     is_bright_enough = logical(padded_stack_yxz > intensity_threshold) ;
@@ -31,8 +31,8 @@ function [voxel_count_from_label, ...
     serial_voxel_indices_from_label = component_struct.PixelIdxList ;
     component_count = length(serial_voxel_indices_from_label) ;
     component_properties = regionprops3(component_struct) ;
-    voxel_count_from_label = component_properties.Volume ;
-    component_centroid_ijk1_from_label = component_properties.Centroid ;
+    voxel_count_from_label = reshape(component_properties.Volume, [component_count 1]) ;  % force empty to be right shape
+    component_centroid_ijk1_from_label = reshape(component_properties.Centroid, [component_count 3]) ;  % force empty to be right shape
     %funky_bounding_box_from_label = component_properties.BoundingBox ;
     component_centroid_xyz_from_label = padded_origin_xyz + spacing_xyz .* (component_centroid_ijk1_from_label-1) ;
     %stats = regionprops3(label_stack_yxz, {'Volume', 'Centroid',
