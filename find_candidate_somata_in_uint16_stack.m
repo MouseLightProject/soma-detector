@@ -33,7 +33,8 @@ function [component_centroid_xyz_from_label, ...
     component_struct = bwconncomp(is_bright_enough) ;
     serial_voxel_indices_from_label = component_struct.PixelIdxList ;
     component_count = length(serial_voxel_indices_from_label) ;
-    component_properties = regionprops3(component_struct) ;
+    component_properties = regionprops3(component_struct, 'Volume', 'Centroid', 'BoundingBox') ;
+    %component_properties = regionprops3(component_struct, 'Volume', 'Centroid', 'BoundingBox', 'VoxelList') ;
     voxel_count_from_label = reshape(component_properties.Volume, [component_count 1]) ;  % force empty to be right shape
     component_centroid_ijk1_from_label = reshape(component_properties.Centroid, [component_count 3]) ;  % force empty to be right shape
     %funky_bounding_box_from_label = component_properties.BoundingBox ;
