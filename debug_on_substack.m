@@ -1,12 +1,3 @@
-sample_date = '2019-10-04' ;
-rendered_folder_path = sprintf('/nrs/mouselight/SAMPLES/%s', sample_date) ;
-roi_center_xyz = [73846.8, 18235.4, 36316.3] ;  % um
-roi_corner_xyz = [74884.4, 19198.9, 36316.3] ; % um 
-pad_depth_in_um = 50 ; % um
-zoom_level = 4 ;
-gfp_channel_index = 0 ;
-background_channel_index = 1 ;
-
 render_parameters_file_path = fullfile(rendered_folder_path, 'calculated_parameters.jl') ;
 render_parameters = read_renderer_calculated_parameters_file(render_parameters_file_path) ;
 max_zoom_level = render_parameters.level_step_count ;
@@ -62,15 +53,15 @@ substack_mip = max(padded_substack_yxz,[], 3) ;
 
 intensity_threshold = 0.8 * 2^16 ;
 minimum_volume = 500 ;  % um^3
-maximum_volume = 15000 ;  % um^3
+%maximum_volume = 15000 ;  % um^3
+maximum_volume = 25000 ;  % um^3
 maximum_sqrt_condition_number = 10 ;
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
                     'maximum_volume', {maximum_volume}, ...
                     'maximum_sqrt_condition_number', maximum_sqrt_condition_number) ;
 
-[xyz_from_candidate_index, ...
- feature_struct_from_candidate_index] = ... 
+feature_struct_from_candidate_index = ... 
     find_candidate_somata_in_uint16_stack(...
         padded_substack_yxz, ...
         padded_substack_origin_xyz, ...
@@ -78,11 +69,12 @@ parameters = struct('intensity_threshold', {intensity_threshold}, ...
         substack_origin_xyz, ...
         substack_shape_xyz, ...
         parameters) ;
-        % these are in the coordinate system of the full stack        
+        % these are in the coordinate system of the full stack
+candidate_count = length(feature_struct_from_candidate_index) ;
+xyz_from_candidate_index = reshape([feature_struct_from_candidate_index.centroidoid_xyz], [3 candidate_count])' ;
 voxel_count_from_candidate_index = [feature_struct_from_candidate_index.voxel_count]' ;
 sqrt_condition_number_from_candidate_index = [feature_struct_from_candidate_index.sqrt_condition_number]' ;
 max_intensity_from_candidate_index = [feature_struct_from_candidate_index.max_intensity]' ;
-candidate_count = size(xyz_from_candidate_index,1) ;
 
 
 
@@ -100,12 +92,12 @@ end
 is_match_distance_threshold = 20 ;
 [is_target_candidate_match, target_candidate_match_distance] = match_targets_and_guesses(target_candidate_distance_matrix, is_match_distance_threshold) ;
 
-is_there_a_matched_candidate_from_target_index = any(is_target_candidate_match, 2) 
-is_there_a_matched_target_from_candidate_index = any(is_target_candidate_match, 1)'  % want a col 
-[distance_to_matched_candidate_from_target_index, matching_candidate_index_from_target_index] = min(target_candidate_match_distance, [], 2) 
+is_there_a_matched_candidate_from_target_index = any(is_target_candidate_match, 2) ;
+is_there_a_matched_target_from_candidate_index = any(is_target_candidate_match, 1)' ; % want a col 
+[distance_to_matched_candidate_from_target_index, matching_candidate_index_from_target_index] = min(target_candidate_match_distance, [], 2) ;
 [distance_to_matched_target_from_candidate_index_as_row, matching_target_index_from_candidate_index_as_row] = min(target_candidate_match_distance, [], 1) ;
-distance_to_matched_target_from_candidate_index = distance_to_matched_target_from_candidate_index_as_row' 
-matching_target_index_from_candidate_index = matching_target_index_from_candidate_index_as_row'
+distance_to_matched_target_from_candidate_index = distance_to_matched_target_from_candidate_index_as_row' ;
+matching_target_index_from_candidate_index = matching_target_index_from_candidate_index_as_row' ;
 
 
 candidate_hit_count = sum(is_there_a_matched_candidate_from_target_index)
@@ -231,17 +223,17 @@ end
 
 [is_target_guess_match, target_guess_match_distance] = match_targets_and_guesses(target_guess_distance_matrix, is_match_distance_threshold) ;
 
-is_there_a_matched_guess_from_target_index = any(is_target_guess_match, 2) 
-is_there_a_matched_target_from_guess_index = any(is_target_guess_match, 1) 
-[distance_to_matched_guess_from_target_index, matching_guess_index_from_target_index] = min(target_guess_match_distance, [], 2) 
-[distance_to_matched_target_from_guess_index, matching_target_index_from_guess_index] = min(target_guess_match_distance, [], 1) 
+is_there_a_matched_guess_from_target_index = any(is_target_guess_match, 2) ;
+is_there_a_matched_target_from_guess_index = any(is_target_guess_match, 1) ;
+[distance_to_matched_guess_from_target_index, matching_guess_index_from_target_index] = min(target_guess_match_distance, [], 2) ;
+[distance_to_matched_target_from_guess_index, matching_target_index_from_guess_index] = min(target_guess_match_distance, [], 1) ;
 
 is_hit_from_target_index = is_there_a_matched_guess_from_target_index ;
 is_hit_from_guess_index = is_there_a_matched_target_from_guess_index ;
 is_miss_from_target_index = ~is_there_a_matched_guess_from_target_index ;
 is_chase_from_guess_index = ~is_there_a_matched_target_from_guess_index ;
 
-guess_hit_count = sum(is_hit_from_target_index)
+guess_hit_count = sum(is_hit_from_target_index) 
 assert( sum(is_hit_from_guess_index) == guess_hit_count ) ;
 guess_miss_count = sum(is_miss_from_target_index)
 guess_chase_count = sum(is_chase_from_guess_index)
