@@ -5,11 +5,16 @@ function [matching_candidate_index_from_target_index, matching_target_index_from
                                              heckbert_origin_xyz, ...
                                              stack_shape_xyz, ...
                                              spacing_at_zoom_level_xyz, ...
-                                             substack_mip)
+                                             substack_mip, ...
+                                             do_plot_candidates)
     
-    is_there_a_mip = exist('substack_mip', 'var') ;
+    is_there_a_mip = exist('substack_mip', 'var') && ~isempty(substack_mip) ;
     if ~is_there_a_mip ,        
         substack_mip = [] ;
+    end
+    
+    if ~exist('do_plot_candidates', 'var') || isempty(do_plot_candidates) ,
+        do_plot_candidates = true ;
     end
     
     % Figure out what targets are in what candidates
@@ -35,8 +40,8 @@ function [matching_candidate_index_from_target_index, matching_target_index_from
     miss_count = sum(~is_there_a_matched_candidate_from_target_index)
     chase_count = sum(~is_there_a_matched_target_from_candidate_index)
 
-    precision = hit_count / candidate_count 
     recall = hit_count / target_count 
+    precision = hit_count / candidate_count 
 
 
     % Plot the MIP image
@@ -65,18 +70,20 @@ function [matching_candidate_index_from_target_index, matching_target_index_from
         plot(target_xyz(1), target_xyz(2), 'Marker', '+', 'Color', marker_color) ;            
         %text(target_xyz(1)+5, target_xyz(2)+5, sprintf('t%d', target_index), 'Color', 0.5*[1 1 1]) ;            
     end
-    for candidate_index = 1 : candidate_count ,
-        candidate_xyz = feature_struct_from_candidate_index(candidate_index).centroidoid_xyz ;
-        marker_color = fif(is_there_a_matched_target_from_candidate_index(candidate_index), [0 0.5 1], [1 0 0]) ;    
-        plot(candidate_xyz(1), candidate_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
-        %text(candidate_xyz(1)-5, candidate_xyz(2)-5, sprintf('g%d', candidate_index), 'Color', 0.5*[1 1 1]) ;            
-    end
-    for target_index = 1 : target_count ,
-        target_xyz = xyz_from_target_index(target_index,:) ;
-        if is_there_a_matched_candidate_from_target_index(target_index) ,
-            candidate_index = matching_candidate_index_from_target_index(target_index) ;
+    if do_plot_candidates ,
+        for candidate_index = 1 : candidate_count ,
             candidate_xyz = feature_struct_from_candidate_index(candidate_index).centroidoid_xyz ;
-            plot([target_xyz(1) candidate_xyz(1)], [target_xyz(2) candidate_xyz(2)], 'Color', [0 0.5 1]) ;    
+            marker_color = fif(is_there_a_matched_target_from_candidate_index(candidate_index), [0 0.5 1], [1 0 0]) ;    
+            plot(candidate_xyz(1), candidate_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
+            %text(candidate_xyz(1)-5, candidate_xyz(2)-5, sprintf('g%d', candidate_index), 'Color', 0.5*[1 1 1]) ;            
+        end
+        for target_index = 1 : target_count ,
+            target_xyz = xyz_from_target_index(target_index,:) ;
+            if is_there_a_matched_candidate_from_target_index(target_index) ,
+                candidate_index = matching_candidate_index_from_target_index(target_index) ;
+                candidate_xyz = feature_struct_from_candidate_index(candidate_index).centroidoid_xyz ;
+                plot([target_xyz(1) candidate_xyz(1)], [target_xyz(2) candidate_xyz(2)], 'Color', [0 0.5 1]) ;    
+            end
         end
     end
     hold off ; 
