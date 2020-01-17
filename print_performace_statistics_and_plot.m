@@ -5,12 +5,16 @@ function [matching_candidate_index_from_target_index, matching_target_index_from
                                              heckbert_origin_xyz, ...
                                              stack_shape_xyz, ...
                                              spacing_at_zoom_level_xyz, ...
-                                             substack_mip, ...
+                                             mip, ...
+                                             mip_origin_xy, ...
                                              do_plot_candidates)
-    
-    is_there_a_mip = exist('substack_mip', 'var') && ~isempty(substack_mip) ;
+    %  heckbert_origin_xyz, stack_shape_xyz are for the full stack,
+    %  regardless of what region the targets and components are drawn from
+                                         
+    is_there_a_mip = exist('mip', 'var') && ~isempty(mip) ;
     if ~is_there_a_mip ,        
-        substack_mip = [] ;
+        mip = [] ;
+        mip_origin_xy = [] ;
     end
     
     if ~exist('do_plot_candidates', 'var') || isempty(do_plot_candidates) ,
@@ -45,17 +49,19 @@ function [matching_candidate_index_from_target_index, matching_target_index_from
 
 
     % Plot the MIP image
-    heckbert_far_corner_xyz = heckbert_origin_xyz + stack_shape_xyz ;
+    mip_shape_ji = size(mip) ;
+    mip_shape_ij = mip_shape_ji([2 1]) ;
+    mip_far_corner_xy = mip_origin_xy + spacing_at_zoom_level_xyz(1:2) .* (mip_shape_ij-1) ;
     f = figure('color', 'w', 'name', sprintf('targets-and-%s', what_are_these)) ;
     a = axes(f, 'YDir', 'reverse') ;
     if is_there_a_mip ,
-        image(a, 'CData', substack_mip, ...
-                 'XData', [padded_substack_origin_xyz(1) padded_substack_far_corner_xyz(1)], ...
-                 'YData', [padded_substack_origin_xyz(2) padded_substack_far_corner_xyz(2)], ...
+        image(a, 'CData', mip, ...
+                 'XData', [mip_origin_xy(1) mip_far_corner_xy(1)], ...
+                 'YData', [mip_origin_xy(2) mip_far_corner_xy(2)], ...
                  'CDataMapping', 'scaled') ;         
     end
-    xlim([heckbert_origin_xyz(1) heckbert_far_corner_xyz(1)]) ;
-    ylim([heckbert_origin_xyz(2) heckbert_far_corner_xyz(2)]) ;
+    xlim([mip_origin_xy(1) mip_far_corner_xy(1)] + spacing_at_zoom_level_xyz(1)/2*[-1 +1]) ;
+    ylim([mip_origin_xy(2) mip_far_corner_xy(2)] + spacing_at_zoom_level_xyz(2)/2*[-1 +1]) ;
     colormap(gray(256)) ;
     axis image    
     xlabel('x (um)') ;

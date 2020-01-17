@@ -11,6 +11,9 @@ spacing_at_zoom_level_xyz = spacing_at_zoom_level_0_xyz ./ (2^zoom_level) ;
 heckbert_origin_xyz = origin_at_max_zoom_xyz - spacing_at_max_zoom_xyz/2 ;  % this origin does not change with the zoom level
 origin_at_zoom_level_xyz = heckbert_origin_xyz + spacing_at_zoom_level_xyz/2 ;
 
+stack_shape_ijk = chunk_shape_ijk * 2^zoom_level ;  % the shape of the full-brain stack, at zoom level zoom_level
+stack_shape_xyz = stack_shape_ijk .* spacing_at_zoom_level_xyz  % the shape of the full-brain stack in um, does not change with zoom level
+
 substack_desired_half_shape_xyz = abs(roi_corner_xyz - roi_center_xyz) ;
 substack_desired_half_shape_xyz(3) = mean(substack_desired_half_shape_xyz(1:2)) ;  % want similar extent in z
 substack_desired_shape_xyz = 2 * substack_desired_half_shape_xyz 
@@ -48,6 +51,8 @@ target_count = size(xyz_from_target_index, 1)
 
 padded_substack_yxz = ...
     get_mouselight_rendered_substack(rendered_folder_path, gfp_channel_index, padded_substack_origin_ijk1, padded_substack_shape_ijk, zoom_level) ;  
+padded_background_substack_yxz = ...
+    get_mouselight_rendered_substack(rendered_folder_path, background_channel_index, padded_substack_origin_ijk1, padded_substack_shape_ijk, zoom_level) ;  
 
 substack_mip = max(padded_substack_yxz,[], 3) ;
 
@@ -59,6 +64,7 @@ parameters = struct('intensity_threshold', {intensity_threshold}, ...
 feature_struct_from_candidate_index = ... 
     find_candidate_somata_in_uint16_stack(...
         padded_substack_yxz, ...
+        padded_background_substack_yxz, ...
         padded_substack_origin_xyz, ...
         origin_at_zoom_level_xyz, ...
         spacing_at_zoom_level_xyz, ...
@@ -71,92 +77,104 @@ xyz_from_candidate_index = reshape([feature_struct_from_candidate_index.centroid
 voxel_count_from_candidate_index = [feature_struct_from_candidate_index.voxel_count]' ;
 sqrt_condition_number_from_candidate_index = [feature_struct_from_candidate_index.sqrt_condition_number]' ;
 max_intensity_from_candidate_index = [feature_struct_from_candidate_index.max_intensity]' ;
+max_background_intensity_from_candidate_index = [feature_struct_from_candidate_index.max_background_intensity]' ;
 
+% Report the perf of the guesses
+print_performace_statistics_and_plot('candidates', ...
+                                     xyz_from_target_index, ...
+                                     feature_struct_from_candidate_index, ...
+                                     heckbert_origin_xyz, ...
+                                     stack_shape_xyz, ...
+                                     spacing_at_zoom_level_xyz, ...
+                                     substack_mip, ...
+                                     padded_substack_origin_xyz(1:2)) ;
+
+
+% % %
+% % % Old way of figuring out which targets match which candidates
+% % %
+% % 
+% % % Calculate distance between each target and each guess
+% % target_candidate_distance_matrix = zeros(target_count, candidate_count) ;
+% % for i = 1 : target_count ,
+% %     target_i_xyz = xyz_from_target_index(i,:) ;
+% %     for j = 1 : candidate_count ,
+% %         candidate_j_xyz = xyz_from_candidate_index(j,:) ;
+% %         distance = sqrt(sum((candidate_j_xyz - target_i_xyz).^2)) ;
+% %         target_candidate_distance_matrix(i,j) = distance ;        
+% %     end
+% % end
+% % 
+% % is_match_distance_threshold = 20 ;
+% % [is_target_candidate_match, target_candidate_match_distance] = match_targets_and_guesses(target_candidate_distance_matrix, is_match_distance_threshold) ;
+% % 
+% % is_there_a_matched_candidate_from_target_index = any(is_target_candidate_match, 2) ;
+% % is_there_a_matched_target_from_candidate_index = any(is_target_candidate_match, 1) ;
+% % [distance_to_matched_candidate_from_target_index, matching_candidate_index_from_target_index] = min(target_candidate_match_distance, [], 2) ;
+% % [distance_to_matched_target_from_candidate_index, matching_target_index_from_candidate_index] = min(target_candidate_match_distance, [], 1) ;
+% 
 % %
-% % Old way of figuring out which targets match which candidates
+% % New way of figuring out which targets match which candidates
 % %
 % 
-% % Calculate distance between each target and each guess
-% target_candidate_distance_matrix = zeros(target_count, candidate_count) ;
-% for i = 1 : target_count ,
-%     target_i_xyz = xyz_from_target_index(i,:) ;
-%     for j = 1 : candidate_count ,
-%         candidate_j_xyz = xyz_from_candidate_index(j,:) ;
-%         distance = sqrt(sum((candidate_j_xyz - target_i_xyz).^2)) ;
-%         target_candidate_distance_matrix(i,j) = distance ;        
-%     end
-% end
+% % Figure out what targets are in what candidates
+% matching_candidate_index_from_target_index = ...
+%     match_targets_and_components(xyz_from_target_index, feature_struct_from_candidate_index, origin_at_zoom_level_xyz, spacing_at_zoom_level_xyz) ;
+% matching_target_index_from_candidate_index = invert_partial_map_array(matching_candidate_index_from_target_index, candidate_count) ;
+% is_there_a_matched_candidate_from_target_index = isfinite(matching_candidate_index_from_target_index) ;
+% is_there_a_matched_target_from_candidate_index = isfinite(matching_target_index_from_candidate_index) ;
 % 
-% is_match_distance_threshold = 20 ;
-% [is_target_candidate_match, target_candidate_match_distance] = match_targets_and_guesses(target_candidate_distance_matrix, is_match_distance_threshold) ;
+% %
+% % End of new way
+% %
 % 
-% is_there_a_matched_candidate_from_target_index = any(is_target_candidate_match, 2) ;
-% is_there_a_matched_target_from_candidate_index = any(is_target_candidate_match, 1) ;
-% [distance_to_matched_candidate_from_target_index, matching_candidate_index_from_target_index] = min(target_candidate_match_distance, [], 2) ;
-% [distance_to_matched_target_from_candidate_index, matching_target_index_from_candidate_index] = min(target_candidate_match_distance, [], 1) ;
-
-%
-% New way of figuring out which targets match which candidates
-%
-
-% Figure out what targets are in what candidates
-matching_candidate_index_from_target_index = ...
-    match_targets_and_components(xyz_from_target_index, feature_struct_from_candidate_index, origin_at_zoom_level_xyz, spacing_at_zoom_level_xyz) ;
-matching_target_index_from_candidate_index = invert_partial_map_array(matching_candidate_index_from_target_index, candidate_count) ;
-is_there_a_matched_candidate_from_target_index = isfinite(matching_candidate_index_from_target_index) ;
-is_there_a_matched_target_from_candidate_index = isfinite(matching_target_index_from_candidate_index) ;
-
-%
-% End of new way
-%
-
-% Compute hit counts, precision, recall for the candidates
-target_count
-candidate_count
-candidate_hit_count = sum(is_there_a_matched_candidate_from_target_index)
-assert( sum(is_there_a_matched_target_from_candidate_index) == candidate_hit_count ) ;
-candidate_miss_count = sum(~is_there_a_matched_candidate_from_target_index)
-candidate_chase_count = sum(~is_there_a_matched_target_from_candidate_index)
-
-candidate_precision = candidate_hit_count / candidate_count 
-candidate_recall = candidate_hit_count / target_count 
-
-
-% Plot the MIP image
-f = figure('color', 'w', 'name', 'targets-and-candidates') ;
-a = axes(f, 'YDir', 'reverse') ;
-image(a, 'CData', substack_mip, ...
-         'XData', [padded_substack_origin_xyz(1) padded_substack_far_corner_xyz(1)], ...
-         'YData', [padded_substack_origin_xyz(2) padded_substack_far_corner_xyz(2)], ...
-         'CDataMapping', 'scaled') ;         
-colormap(gray(256)) ;
-axis image
-xlabel('x (um)') ;
-ylabel('y (um)') ;
-
-% plot each target, and each candidate, and draw a line between matches
-hold on ;
-for target_index = 1 : target_count ,
-    target_xyz = xyz_from_target_index(target_index,:) ;
-    marker_color = fif(is_there_a_matched_candidate_from_target_index(target_index), [0 0.5 1], [1 0 0]) ;    
-    plot(target_xyz(1), target_xyz(2), 'Marker', '+', 'Color', marker_color) ;            
-    %text(target_xyz(1)+5, target_xyz(2)+5, sprintf('t%d', target_index), 'Color', 0.5*[1 1 1]) ;            
-end
-% for candidate_index = 1 : candidate_count ,
-%     candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
-%     marker_color = fif(is_there_a_matched_target_from_candidate_index(candidate_index), [0 0.5 1], [1 0 0]) ;    
-%     plot(candidate_xyz(1), candidate_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
-%     %text(candidate_xyz(1)-5, candidate_xyz(2)-5, sprintf('g%d', candidate_index), 'Color', 0.5*[1 1 1]) ;            
-% end
+% % Compute hit counts, precision, recall for the candidates
+% target_count
+% candidate_count
+% candidate_hit_count = sum(is_there_a_matched_candidate_from_target_index)
+% assert( sum(is_there_a_matched_target_from_candidate_index) == candidate_hit_count ) ;
+% candidate_miss_count = sum(~is_there_a_matched_candidate_from_target_index)
+% candidate_chase_count = sum(~is_there_a_matched_target_from_candidate_index)
+% 
+% candidate_precision = candidate_hit_count / candidate_count 
+% candidate_recall = candidate_hit_count / target_count 
+% 
+% 
+% % Plot the MIP image
+% f = figure('color', 'w', 'name', 'targets-and-candidates') ;
+% a = axes(f, 'YDir', 'reverse') ;
+% image(a, 'CData', substack_mip, ...
+%          'XData', [padded_substack_origin_xyz(1) padded_substack_far_corner_xyz(1)], ...
+%          'YData', [padded_substack_origin_xyz(2) padded_substack_far_corner_xyz(2)], ...
+%          'CDataMapping', 'scaled') ;         
+% colormap(gray(256)) ;
+% axis image
+% xlabel('x (um)') ;
+% ylabel('y (um)') ;
+% 
+% % plot each target, and each candidate, and draw a line between matches
+% hold on ;
 % for target_index = 1 : target_count ,
 %     target_xyz = xyz_from_target_index(target_index,:) ;
-%     if is_there_a_matched_candidate_from_target_index(target_index) ,
-%         candidate_index = matching_candidate_index_from_target_index(target_index) ;
-%         candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
-%         plot([target_xyz(1) candidate_xyz(1)], [target_xyz(2) candidate_xyz(2)], 'Color', [0 0.5 1]) ;    
-%     end
+%     marker_color = fif(is_there_a_matched_candidate_from_target_index(target_index), [0 0.5 1], [1 0 0]) ;    
+%     plot(target_xyz(1), target_xyz(2), 'Marker', '+', 'Color', marker_color) ;            
+%     %text(target_xyz(1)+5, target_xyz(2)+5, sprintf('t%d', target_index), 'Color', 0.5*[1 1 1]) ;            
 % end
-hold off ; 
+% % for candidate_index = 1 : candidate_count ,
+% %     candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
+% %     marker_color = fif(is_there_a_matched_target_from_candidate_index(candidate_index), [0 0.5 1], [1 0 0]) ;    
+% %     plot(candidate_xyz(1), candidate_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
+% %     %text(candidate_xyz(1)-5, candidate_xyz(2)-5, sprintf('g%d', candidate_index), 'Color', 0.5*[1 1 1]) ;            
+% % end
+% % for target_index = 1 : target_count ,
+% %     target_xyz = xyz_from_target_index(target_index,:) ;
+% %     if is_there_a_matched_candidate_from_target_index(target_index) ,
+% %         candidate_index = matching_candidate_index_from_target_index(target_index) ;
+% %         candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
+% %         plot([target_xyz(1) candidate_xyz(1)], [target_xyz(2) candidate_xyz(2)], 'Color', [0 0.5 1]) ;    
+% %     end
+% % end
+% hold off ; 
 
 
 
@@ -175,7 +193,8 @@ maximum_volume_in_voxels = maximum_volume / volume_per_voxel
 is_guess_from_candidate_index = ...
     (minimum_volume_in_voxels < voxel_count_from_candidate_index) & ...
     (voxel_count_from_candidate_index < maximum_volume_in_voxels) & ...
-    sqrt_condition_number_from_candidate_index < maximum_sqrt_condition_number ;
+    sqrt_condition_number_from_candidate_index < maximum_sqrt_condition_number & ...
+    max_intensity_from_candidate_index > max_background_intensity_from_candidate_index ;
 feature_struct_from_guess_index = feature_struct_from_candidate_index(is_guess_from_candidate_index) ;
 guess_count = length(feature_struct_from_guess_index) ;
 
@@ -220,83 +239,75 @@ guess_count = length(feature_struct_from_guess_index) ;
 
 
 
-% % Calculate distance between each target and each guess
-% target_guess_distance_matrix = zeros(target_count, guess_count) ;
-% for i = 1 : target_count ,
-%     target_i_xyz = xyz_from_target_index(i,:) ;
-%     for j = 1 : guess_count ,
-%         guess_j_xyz = xyz_from_guess_index(j,:) ;
-%         distance = sqrt(sum((guess_j_xyz - target_i_xyz).^2)) ;
-%         target_guess_distance_matrix(i,j) = distance ;        
+% Report the perf of the guesses
+print_performace_statistics_and_plot('guesses', ...
+                                     xyz_from_target_index, ...
+                                     feature_struct_from_guess_index, ...
+                                     heckbert_origin_xyz, ...
+                                     stack_shape_xyz, ...
+                                     spacing_at_zoom_level_xyz, ...
+                                     substack_mip, ...
+                                     padded_substack_origin_xyz(1:2)) ;
+
+% % Figure out what targets are in what guesses
+% matching_guess_index_from_target_index = ...
+%     match_targets_and_components(xyz_from_target_index, feature_struct_from_guess_index, origin_at_zoom_level_xyz, spacing_at_zoom_level_xyz) ;
+% matching_target_index_from_guess_index = invert_partial_map_array(matching_guess_index_from_target_index, guess_count) ;
+% is_there_a_matched_guess_from_target_index = isfinite(matching_guess_index_from_target_index) ;
+% is_there_a_matched_target_from_guess_index = isfinite(matching_target_index_from_guess_index) ;
+% 
+% 
+% is_hit_from_target_index = is_there_a_matched_guess_from_target_index ;
+% is_hit_from_guess_index = is_there_a_matched_target_from_guess_index ;
+% is_miss_from_target_index = ~is_there_a_matched_guess_from_target_index ;
+% is_chase_from_guess_index = ~is_there_a_matched_target_from_guess_index ;
+% 
+% target_count
+% guess_count
+% guess_hit_count = sum(is_hit_from_target_index) 
+% assert( sum(is_hit_from_guess_index) == guess_hit_count ) ;
+% guess_miss_count = sum(is_miss_from_target_index)
+% guess_chase_count = sum(is_chase_from_guess_index)
+% 
+% guess_precision = guess_hit_count / guess_count 
+% guess_recall = guess_hit_count / target_count 
+% 
+% 
+% % Plot the MIP image
+% f = figure('color', 'w', 'name', 'targets-and-guesses') ;
+% a = axes(f, 'YDir', 'reverse') ;
+% image(a, 'CData', substack_mip, ...
+%          'XData', [padded_substack_origin_xyz(1) padded_substack_far_corner_xyz(1)], ...
+%          'YData', [padded_substack_origin_xyz(2) padded_substack_far_corner_xyz(2)], ...
+%          'CDataMapping', 'scaled') ;         
+% colormap(gray(256)) ;
+% axis image
+% xlabel('x (um)') ;
+% ylabel('y (um)') ;
+% 
+% % plot each target, and each guess, and draw a line between matches
+% hold on ;
+% for target_index = 1 : target_count ,
+%     target_xyz = xyz_from_target_index(target_index,:) ;
+%     marker_color = fif(is_there_a_matched_guess_from_target_index(target_index), [0 0.5 1], [1 0 0]) ;    
+%     plot(target_xyz(1), target_xyz(2), 'Marker', '+', 'Color', marker_color) ;            
+%     %text(target_xyz(1)+5, target_xyz(2)+5, sprintf('t%d', target_index), 'Color', 0.5*[1 1 1]) ;            
+% end
+% for guess_index = 1 : guess_count ,
+%     guess_xyz = feature_struct_from_guess_index(guess_index).centroidoid_xyz ;
+%     marker_color = fif(is_there_a_matched_target_from_guess_index(guess_index), [0 0.5 1], [1 0 0]) ;    
+%     plot(guess_xyz(1), guess_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
+%     %text(guess_xyz(1)-5, guess_xyz(2)-5, sprintf('g%d', guess_index), 'Color', 0.5*[1 1 1]) ;            
+% end
+% for target_index = 1 : target_count ,
+%     target_xyz = xyz_from_target_index(target_index,:) ;
+%     if is_there_a_matched_guess_from_target_index(target_index) ,
+%         guess_index = matching_guess_index_from_target_index(target_index) ;
+%         guess_xyz = feature_struct_from_guess_index(guess_index).centroidoid_xyz ;
+%         plot([target_xyz(1) guess_xyz(1)], [target_xyz(2) guess_xyz(2)], 'Color', [0 0.5 1]) ;    
 %     end
 % end
-% 
-% [is_target_guess_match, target_guess_match_distance] = match_targets_and_guesses(target_guess_distance_matrix, is_match_distance_threshold) ;
-% 
-% is_there_a_matched_guess_from_target_index = any(is_target_guess_match, 2) ;
-% is_there_a_matched_target_from_guess_index = any(is_target_guess_match, 1) ;
-% [distance_to_matched_guess_from_target_index, matching_guess_index_from_target_index] = min(target_guess_match_distance, [], 2) ;
-% [distance_to_matched_target_from_guess_index, matching_target_index_from_guess_index] = min(target_guess_match_distance, [], 1) ;
-
-% Figure out what targets are in what guesses
-matching_guess_index_from_target_index = ...
-    match_targets_and_components(xyz_from_target_index, feature_struct_from_guess_index, origin_at_zoom_level_xyz, spacing_at_zoom_level_xyz) ;
-matching_target_index_from_guess_index = invert_partial_map_array(matching_guess_index_from_target_index, guess_count) ;
-is_there_a_matched_guess_from_target_index = isfinite(matching_guess_index_from_target_index) ;
-is_there_a_matched_target_from_guess_index = isfinite(matching_target_index_from_guess_index) ;
-
-
-is_hit_from_target_index = is_there_a_matched_guess_from_target_index ;
-is_hit_from_guess_index = is_there_a_matched_target_from_guess_index ;
-is_miss_from_target_index = ~is_there_a_matched_guess_from_target_index ;
-is_chase_from_guess_index = ~is_there_a_matched_target_from_guess_index ;
-
-target_count
-guess_count
-guess_hit_count = sum(is_hit_from_target_index) 
-assert( sum(is_hit_from_guess_index) == guess_hit_count ) ;
-guess_miss_count = sum(is_miss_from_target_index)
-guess_chase_count = sum(is_chase_from_guess_index)
-
-guess_precision = guess_hit_count / guess_count 
-guess_recall = guess_hit_count / target_count 
-
-
-% Plot the MIP image
-f = figure('color', 'w', 'name', 'targets-and-guesses') ;
-a = axes(f, 'YDir', 'reverse') ;
-image(a, 'CData', substack_mip, ...
-         'XData', [padded_substack_origin_xyz(1) padded_substack_far_corner_xyz(1)], ...
-         'YData', [padded_substack_origin_xyz(2) padded_substack_far_corner_xyz(2)], ...
-         'CDataMapping', 'scaled') ;         
-colormap(gray(256)) ;
-axis image
-xlabel('x (um)') ;
-ylabel('y (um)') ;
-
-% plot each target, and each guess, and draw a line between matches
-hold on ;
-for target_index = 1 : target_count ,
-    target_xyz = xyz_from_target_index(target_index,:) ;
-    marker_color = fif(is_there_a_matched_guess_from_target_index(target_index), [0 0.5 1], [1 0 0]) ;    
-    plot(target_xyz(1), target_xyz(2), 'Marker', '+', 'Color', marker_color) ;            
-    %text(target_xyz(1)+5, target_xyz(2)+5, sprintf('t%d', target_index), 'Color', 0.5*[1 1 1]) ;            
-end
-for guess_index = 1 : guess_count ,
-    guess_xyz = feature_struct_from_guess_index(guess_index).centroidoid_xyz ;
-    marker_color = fif(is_there_a_matched_target_from_guess_index(guess_index), [0 0.5 1], [1 0 0]) ;    
-    plot(guess_xyz(1), guess_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
-    %text(guess_xyz(1)-5, guess_xyz(2)-5, sprintf('g%d', guess_index), 'Color', 0.5*[1 1 1]) ;            
-end
-for target_index = 1 : target_count ,
-    target_xyz = xyz_from_target_index(target_index,:) ;
-    if is_there_a_matched_guess_from_target_index(target_index) ,
-        guess_index = matching_guess_index_from_target_index(target_index) ;
-        guess_xyz = feature_struct_from_guess_index(guess_index).centroidoid_xyz ;
-        plot([target_xyz(1) guess_xyz(1)], [target_xyz(2) guess_xyz(2)], 'Color', [0 0.5 1]) ;    
-    end
-end
-hold off ; 
+% hold off ; 
 
 
 
