@@ -51,11 +51,6 @@ padded_substack_yxz = ...
 
 substack_mip = max(padded_substack_yxz,[], 3) ;
 
-intensity_threshold = 0.8 * 2^16 ;
-minimum_volume = 500 ;  % um^3
-%maximum_volume = 15000 ;  % um^3
-maximum_volume = 25000 ;  % um^3
-maximum_sqrt_condition_number = 10 ;
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
                     'maximum_volume', {maximum_volume}, ...
@@ -65,6 +60,7 @@ feature_struct_from_candidate_index = ...
     find_candidate_somata_in_uint16_stack(...
         padded_substack_yxz, ...
         padded_substack_origin_xyz, ...
+        origin_at_zoom_level_xyz, ...
         spacing_at_zoom_level_xyz, ...
         substack_origin_xyz, ...
         substack_shape_xyz, ...
@@ -76,30 +72,47 @@ voxel_count_from_candidate_index = [feature_struct_from_candidate_index.voxel_co
 sqrt_condition_number_from_candidate_index = [feature_struct_from_candidate_index.sqrt_condition_number]' ;
 max_intensity_from_candidate_index = [feature_struct_from_candidate_index.max_intensity]' ;
 
+% %
+% % Old way of figuring out which targets match which candidates
+% %
+% 
+% % Calculate distance between each target and each guess
+% target_candidate_distance_matrix = zeros(target_count, candidate_count) ;
+% for i = 1 : target_count ,
+%     target_i_xyz = xyz_from_target_index(i,:) ;
+%     for j = 1 : candidate_count ,
+%         candidate_j_xyz = xyz_from_candidate_index(j,:) ;
+%         distance = sqrt(sum((candidate_j_xyz - target_i_xyz).^2)) ;
+%         target_candidate_distance_matrix(i,j) = distance ;        
+%     end
+% end
+% 
+% is_match_distance_threshold = 20 ;
+% [is_target_candidate_match, target_candidate_match_distance] = match_targets_and_guesses(target_candidate_distance_matrix, is_match_distance_threshold) ;
+% 
+% is_there_a_matched_candidate_from_target_index = any(is_target_candidate_match, 2) ;
+% is_there_a_matched_target_from_candidate_index = any(is_target_candidate_match, 1) ;
+% [distance_to_matched_candidate_from_target_index, matching_candidate_index_from_target_index] = min(target_candidate_match_distance, [], 2) ;
+% [distance_to_matched_target_from_candidate_index, matching_target_index_from_candidate_index] = min(target_candidate_match_distance, [], 1) ;
 
+%
+% New way of figuring out which targets match which candidates
+%
 
-% Calculate distance between each target and each candidate
-target_candidate_distance_matrix = zeros(target_count, candidate_count) ;
-for i = 1 : target_count ,
-    target_i_xyz = xyz_from_target_index(i,:) ;
-    for j = 1 : candidate_count ,
-        candidate_j_xyz = xyz_from_candidate_index(j,:) ;
-        distance = sqrt(sum((candidate_j_xyz - target_i_xyz).^2)) ;
-        target_candidate_distance_matrix(i,j) = distance ;        
-    end
-end
+% Figure out what targets are in what candidates
+matching_candidate_index_from_target_index = ...
+    match_targets_and_components(xyz_from_target_index, feature_struct_from_candidate_index, origin_at_zoom_level_xyz, spacing_at_zoom_level_xyz) ;
+matching_target_index_from_candidate_index = invert_partial_map_array(matching_candidate_index_from_target_index, candidate_count) ;
+is_there_a_matched_candidate_from_target_index = isfinite(matching_candidate_index_from_target_index) ;
+is_there_a_matched_target_from_candidate_index = isfinite(matching_target_index_from_candidate_index) ;
 
-is_match_distance_threshold = 20 ;
-[is_target_candidate_match, target_candidate_match_distance] = match_targets_and_guesses(target_candidate_distance_matrix, is_match_distance_threshold) ;
+%
+% End of new way
+%
 
-is_there_a_matched_candidate_from_target_index = any(is_target_candidate_match, 2) ;
-is_there_a_matched_target_from_candidate_index = any(is_target_candidate_match, 1)' ; % want a col 
-[distance_to_matched_candidate_from_target_index, matching_candidate_index_from_target_index] = min(target_candidate_match_distance, [], 2) ;
-[distance_to_matched_target_from_candidate_index_as_row, matching_target_index_from_candidate_index_as_row] = min(target_candidate_match_distance, [], 1) ;
-distance_to_matched_target_from_candidate_index = distance_to_matched_target_from_candidate_index_as_row' ;
-matching_target_index_from_candidate_index = matching_target_index_from_candidate_index_as_row' ;
-
-
+% Compute hit counts, precision, recall for the candidates
+target_count
+candidate_count
 candidate_hit_count = sum(is_there_a_matched_candidate_from_target_index)
 assert( sum(is_there_a_matched_target_from_candidate_index) == candidate_hit_count ) ;
 candidate_miss_count = sum(~is_there_a_matched_candidate_from_target_index)
@@ -129,20 +142,20 @@ for target_index = 1 : target_count ,
     plot(target_xyz(1), target_xyz(2), 'Marker', '+', 'Color', marker_color) ;            
     %text(target_xyz(1)+5, target_xyz(2)+5, sprintf('t%d', target_index), 'Color', 0.5*[1 1 1]) ;            
 end
-for candidate_index = 1 : candidate_count ,
-    candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
-    marker_color = fif(is_there_a_matched_target_from_candidate_index(candidate_index), [0 0.5 1], [1 0 0]) ;    
-    plot(candidate_xyz(1), candidate_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
-    %text(candidate_xyz(1)-5, candidate_xyz(2)-5, sprintf('g%d', candidate_index), 'Color', 0.5*[1 1 1]) ;            
-end
-for target_index = 1 : target_count ,
-    target_xyz = xyz_from_target_index(target_index,:) ;
-    if is_there_a_matched_candidate_from_target_index(target_index) ,
-        candidate_index = matching_candidate_index_from_target_index(target_index) ;
-        candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
-        plot([target_xyz(1) candidate_xyz(1)], [target_xyz(2) candidate_xyz(2)], 'Color', [0 0.5 1]) ;    
-    end
-end
+% for candidate_index = 1 : candidate_count ,
+%     candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
+%     marker_color = fif(is_there_a_matched_target_from_candidate_index(candidate_index), [0 0.5 1], [1 0 0]) ;    
+%     plot(candidate_xyz(1), candidate_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
+%     %text(candidate_xyz(1)-5, candidate_xyz(2)-5, sprintf('g%d', candidate_index), 'Color', 0.5*[1 1 1]) ;            
+% end
+% for target_index = 1 : target_count ,
+%     target_xyz = xyz_from_target_index(target_index,:) ;
+%     if is_there_a_matched_candidate_from_target_index(target_index) ,
+%         candidate_index = matching_candidate_index_from_target_index(target_index) ;
+%         candidate_xyz = xyz_from_candidate_index(candidate_index,:) ;
+%         plot([target_xyz(1) candidate_xyz(1)], [target_xyz(2) candidate_xyz(2)], 'Color', [0 0.5 1]) ;    
+%     end
+% end
 hold off ; 
 
 
@@ -163,12 +176,9 @@ is_guess_from_candidate_index = ...
     (minimum_volume_in_voxels < voxel_count_from_candidate_index) & ...
     (voxel_count_from_candidate_index < maximum_volume_in_voxels) & ...
     sqrt_condition_number_from_candidate_index < maximum_sqrt_condition_number ;
-xyz_from_guess_index = xyz_from_candidate_index(is_guess_from_candidate_index, :) ;    
 feature_struct_from_guess_index = feature_struct_from_candidate_index(is_guess_from_candidate_index) ;
-voxel_count_from_guess_index = [feature_struct_from_guess_index.voxel_count]' ;
-sqrt_condition_number_from_guess_index = [feature_struct_from_guess_index.sqrt_condition_number]' ;
-max_intensity_from_guess_index = [feature_struct_from_guess_index.max_intensity]' ;
-guess_count = size(xyz_from_guess_index,1) ;
+guess_count = length(feature_struct_from_guess_index) ;
+
 
 % f = figure('color', 'w') ;
 % a = axes(f, 'YDir', 'reverse') ;
@@ -210,29 +220,39 @@ guess_count = size(xyz_from_guess_index,1) ;
 
 
 
-% Calculate distance between each target and each guess
-target_guess_distance_matrix = zeros(target_count, guess_count) ;
-for i = 1 : target_count ,
-    target_i_xyz = xyz_from_target_index(i,:) ;
-    for j = 1 : guess_count ,
-        guess_j_xyz = xyz_from_guess_index(j,:) ;
-        distance = sqrt(sum((guess_j_xyz - target_i_xyz).^2)) ;
-        target_guess_distance_matrix(i,j) = distance ;        
-    end
-end
+% % Calculate distance between each target and each guess
+% target_guess_distance_matrix = zeros(target_count, guess_count) ;
+% for i = 1 : target_count ,
+%     target_i_xyz = xyz_from_target_index(i,:) ;
+%     for j = 1 : guess_count ,
+%         guess_j_xyz = xyz_from_guess_index(j,:) ;
+%         distance = sqrt(sum((guess_j_xyz - target_i_xyz).^2)) ;
+%         target_guess_distance_matrix(i,j) = distance ;        
+%     end
+% end
+% 
+% [is_target_guess_match, target_guess_match_distance] = match_targets_and_guesses(target_guess_distance_matrix, is_match_distance_threshold) ;
+% 
+% is_there_a_matched_guess_from_target_index = any(is_target_guess_match, 2) ;
+% is_there_a_matched_target_from_guess_index = any(is_target_guess_match, 1) ;
+% [distance_to_matched_guess_from_target_index, matching_guess_index_from_target_index] = min(target_guess_match_distance, [], 2) ;
+% [distance_to_matched_target_from_guess_index, matching_target_index_from_guess_index] = min(target_guess_match_distance, [], 1) ;
 
-[is_target_guess_match, target_guess_match_distance] = match_targets_and_guesses(target_guess_distance_matrix, is_match_distance_threshold) ;
+% Figure out what targets are in what guesses
+matching_guess_index_from_target_index = ...
+    match_targets_and_components(xyz_from_target_index, feature_struct_from_guess_index, origin_at_zoom_level_xyz, spacing_at_zoom_level_xyz) ;
+matching_target_index_from_guess_index = invert_partial_map_array(matching_guess_index_from_target_index, guess_count) ;
+is_there_a_matched_guess_from_target_index = isfinite(matching_guess_index_from_target_index) ;
+is_there_a_matched_target_from_guess_index = isfinite(matching_target_index_from_guess_index) ;
 
-is_there_a_matched_guess_from_target_index = any(is_target_guess_match, 2) ;
-is_there_a_matched_target_from_guess_index = any(is_target_guess_match, 1) ;
-[distance_to_matched_guess_from_target_index, matching_guess_index_from_target_index] = min(target_guess_match_distance, [], 2) ;
-[distance_to_matched_target_from_guess_index, matching_target_index_from_guess_index] = min(target_guess_match_distance, [], 1) ;
 
 is_hit_from_target_index = is_there_a_matched_guess_from_target_index ;
 is_hit_from_guess_index = is_there_a_matched_target_from_guess_index ;
 is_miss_from_target_index = ~is_there_a_matched_guess_from_target_index ;
 is_chase_from_guess_index = ~is_there_a_matched_target_from_guess_index ;
 
+target_count
+guess_count
 guess_hit_count = sum(is_hit_from_target_index) 
 assert( sum(is_hit_from_guess_index) == guess_hit_count ) ;
 guess_miss_count = sum(is_miss_from_target_index)
@@ -263,7 +283,7 @@ for target_index = 1 : target_count ,
     %text(target_xyz(1)+5, target_xyz(2)+5, sprintf('t%d', target_index), 'Color', 0.5*[1 1 1]) ;            
 end
 for guess_index = 1 : guess_count ,
-    guess_xyz = xyz_from_guess_index(guess_index,:) ;
+    guess_xyz = feature_struct_from_guess_index(guess_index).centroidoid_xyz ;
     marker_color = fif(is_there_a_matched_target_from_guess_index(guess_index), [0 0.5 1], [1 0 0]) ;    
     plot(guess_xyz(1), guess_xyz(2), 'Marker', 'o', 'MarkerSize', 6, 'Color', marker_color) ;
     %text(guess_xyz(1)-5, guess_xyz(2)-5, sprintf('g%d', guess_index), 'Color', 0.5*[1 1 1]) ;            
@@ -272,7 +292,7 @@ for target_index = 1 : target_count ,
     target_xyz = xyz_from_target_index(target_index,:) ;
     if is_there_a_matched_guess_from_target_index(target_index) ,
         guess_index = matching_guess_index_from_target_index(target_index) ;
-        guess_xyz = xyz_from_guess_index(guess_index,:) ;
+        guess_xyz = feature_struct_from_guess_index(guess_index).centroidoid_xyz ;
         plot([target_xyz(1) guess_xyz(1)], [target_xyz(2) guess_xyz(2)], 'Color', [0 0.5 1]) ;    
     end
 end
@@ -282,86 +302,86 @@ hold off ;
 
 
 
-% Considering just the cadidates, plot them in feature space, and
-% characterize each as hit/miss/chase/ball.  This makes sense b/c we cast a wide net: every target is
-% also a candidate.
-
-is_positive_from_candidate_index =  is_there_a_matched_target_from_candidate_index ;
-is_negative_from_candidate_index = ~is_there_a_matched_target_from_candidate_index ;
-positive_count_within_candidates = sum(is_positive_from_candidate_index) 
-negative_count_within_candidates = sum(is_negative_from_candidate_index) 
-
-is_test_positive_from_candidate_index =  is_guess_from_candidate_index ;
-is_test_negative_from_candidate_index = ~is_guess_from_candidate_index ;
-test_positive_count_within_candidates = sum(is_test_positive_from_candidate_index) 
-test_negative_count_within_candidates = sum(is_test_negative_from_candidate_index) 
-
-is_hit_from_candidate_index = is_test_positive_from_candidate_index & is_positive_from_candidate_index ;
-is_miss_from_candidate_index = is_test_negative_from_candidate_index & is_positive_from_candidate_index ;
-is_chase_from_candidate_index = is_test_positive_from_candidate_index & is_negative_from_candidate_index ;
-is_ball_from_candidate_index = is_test_negative_from_candidate_index & is_negative_from_candidate_index ;
-
-hit_count_within_candidates = sum(is_hit_from_candidate_index)
-miss_count_within_candidates = sum(is_miss_from_candidate_index)
-chase_count_within_candidates = sum(is_chase_from_candidate_index)
-ball_count_within_candidates = sum(is_ball_from_candidate_index) 
-
-precision_within_candidates = hit_count_within_candidates / test_positive_count_within_candidates 
-recall_within_candidates = hit_count_within_candidates / positive_count_within_candidates 
-
-hit_rate_within_candidates = hit_count_within_candidates / positive_count_within_candidates
-ball_rate_within_candidates = ball_count_within_candidates / negative_count_within_candidates
-
-
-
-% Plot the targets in the (very wimpy) feature space
-f = figure('Color', 'w', 'Name', 'features') ;
-a = axes(f) ;
-h_hit = plot3(max_intensity_from_candidate_index(is_hit_from_candidate_index), ...
-              voxel_count_from_candidate_index(is_hit_from_candidate_index), ...
-              sqrt_condition_number_from_candidate_index(is_hit_from_candidate_index), ...
-              'Marker', '.', 'Color', [0 0.3 1], 'LineStyle', 'none') ;
-hold on ;
-h_miss = plot3(max_intensity_from_candidate_index(is_miss_from_candidate_index), ...
-               voxel_count_from_candidate_index(is_miss_from_candidate_index), ...
-               sqrt_condition_number_from_candidate_index(is_miss_from_candidate_index), ...
-              'Marker', 'd', 'Color', [1 0 0], 'LineStyle', 'none') ;
-h_chase = plot3(max_intensity_from_candidate_index(is_chase_from_candidate_index), ...
-                voxel_count_from_candidate_index(is_chase_from_candidate_index), ...
-                sqrt_condition_number_from_candidate_index(is_chase_from_candidate_index), ...
-              'Marker', 'd', 'Color', [138 43 226]/255, 'LineStyle', 'none') ;
-h_ball = plot3(max_intensity_from_candidate_index(is_ball_from_candidate_index), ...
-               voxel_count_from_candidate_index(is_ball_from_candidate_index), ...
-               sqrt_condition_number_from_candidate_index(is_ball_from_candidate_index), ...
-              'Marker', '.', 'Color', [0 0.8 0], 'LineStyle', 'none') ;
-hold off ;
-xlabel('Max GFP signal (counts)') ;
-ylabel('Voxel count') ;
-zlabel('SD ratio') ;
-%xlim([0 2^16]) ;
-%ylim([0 2^16]) ;
-handles = zeros(1,0) ;
-legend_labels = cell(1,0) ;
-if ~isempty(h_hit) ,
-    handles(1, end+1) = h_hit ;
-    legend_labels{1, end+1} = 'hit' ;
-end
-if ~isempty(h_miss) ,
-    handles(1, end+1) = h_miss ;
-    legend_labels{1, end+1} = 'miss' ;
-end
-if ~isempty(h_chase) ,
-    handles(1, end+1) = h_chase ;
-    legend_labels{1, end+1} = 'chase' ;
-end
-if ~isempty(h_ball) ,
-    handles(1, end+1) = h_ball ;
-    legend_labels{1, end+1} = 'ball' ;
-end
-
-legend(handles, legend_labels, 'Location', 'northwest') ;
-axis vis3d
-grid on
-camproj perspective
-
-
+% % Considering just the cadidates, plot them in feature space, and
+% % characterize each as hit/miss/chase/ball.  This makes sense b/c we cast a wide net: every target is
+% % also a candidate.
+% 
+% is_positive_from_candidate_index =  is_there_a_matched_target_from_candidate_index ;
+% is_negative_from_candidate_index = ~is_there_a_matched_target_from_candidate_index ;
+% positive_count_within_candidates = sum(is_positive_from_candidate_index) 
+% negative_count_within_candidates = sum(is_negative_from_candidate_index) 
+% 
+% is_test_positive_from_candidate_index =  is_guess_from_candidate_index ;
+% is_test_negative_from_candidate_index = ~is_guess_from_candidate_index ;
+% test_positive_count_within_candidates = sum(is_test_positive_from_candidate_index) 
+% test_negative_count_within_candidates = sum(is_test_negative_from_candidate_index) 
+% 
+% is_hit_from_candidate_index = is_test_positive_from_candidate_index & is_positive_from_candidate_index ;
+% is_miss_from_candidate_index = is_test_negative_from_candidate_index & is_positive_from_candidate_index ;
+% is_chase_from_candidate_index = is_test_positive_from_candidate_index & is_negative_from_candidate_index ;
+% is_ball_from_candidate_index = is_test_negative_from_candidate_index & is_negative_from_candidate_index ;
+% 
+% hit_count_within_candidates = sum(is_hit_from_candidate_index)
+% miss_count_within_candidates = sum(is_miss_from_candidate_index)
+% chase_count_within_candidates = sum(is_chase_from_candidate_index)
+% ball_count_within_candidates = sum(is_ball_from_candidate_index) 
+% 
+% precision_within_candidates = hit_count_within_candidates / test_positive_count_within_candidates 
+% recall_within_candidates = hit_count_within_candidates / positive_count_within_candidates 
+% 
+% hit_rate_within_candidates = hit_count_within_candidates / positive_count_within_candidates
+% ball_rate_within_candidates = ball_count_within_candidates / negative_count_within_candidates
+% 
+% 
+% 
+% % Plot the targets in the (very wimpy) feature space
+% f = figure('Color', 'w', 'Name', 'features') ;
+% a = axes(f) ;
+% h_hit = plot3(max_intensity_from_candidate_index(is_hit_from_candidate_index), ...
+%               voxel_count_from_candidate_index(is_hit_from_candidate_index), ...
+%               sqrt_condition_number_from_candidate_index(is_hit_from_candidate_index), ...
+%               'Marker', '.', 'Color', [0 0.3 1], 'LineStyle', 'none') ;
+% hold on ;
+% h_miss = plot3(max_intensity_from_candidate_index(is_miss_from_candidate_index), ...
+%                voxel_count_from_candidate_index(is_miss_from_candidate_index), ...
+%                sqrt_condition_number_from_candidate_index(is_miss_from_candidate_index), ...
+%               'Marker', 'd', 'Color', [1 0 0], 'LineStyle', 'none') ;
+% h_chase = plot3(max_intensity_from_candidate_index(is_chase_from_candidate_index), ...
+%                 voxel_count_from_candidate_index(is_chase_from_candidate_index), ...
+%                 sqrt_condition_number_from_candidate_index(is_chase_from_candidate_index), ...
+%               'Marker', 'd', 'Color', [138 43 226]/255, 'LineStyle', 'none') ;
+% h_ball = plot3(max_intensity_from_candidate_index(is_ball_from_candidate_index), ...
+%                voxel_count_from_candidate_index(is_ball_from_candidate_index), ...
+%                sqrt_condition_number_from_candidate_index(is_ball_from_candidate_index), ...
+%               'Marker', '.', 'Color', [0 0.8 0], 'LineStyle', 'none') ;
+% hold off ;
+% xlabel('Max GFP signal (counts)') ;
+% ylabel('Voxel count') ;
+% zlabel('SD ratio') ;
+% %xlim([0 2^16]) ;
+% %ylim([0 2^16]) ;
+% handles = zeros(1,0) ;
+% legend_labels = cell(1,0) ;
+% if ~isempty(h_hit) ,
+%     handles(1, end+1) = h_hit ;
+%     legend_labels{1, end+1} = 'hit' ;
+% end
+% if ~isempty(h_miss) ,
+%     handles(1, end+1) = h_miss ;
+%     legend_labels{1, end+1} = 'miss' ;
+% end
+% if ~isempty(h_chase) ,
+%     handles(1, end+1) = h_chase ;
+%     legend_labels{1, end+1} = 'chase' ;
+% end
+% if ~isempty(h_ball) ,
+%     handles(1, end+1) = h_ball ;
+%     legend_labels{1, end+1} = 'ball' ;
+% end
+% 
+% legend(handles, legend_labels, 'Location', 'northwest') ;
+% axis vis3d
+% grid on
+% camproj perspective
+% 
+% 

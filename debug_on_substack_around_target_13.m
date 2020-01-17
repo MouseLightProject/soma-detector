@@ -7,6 +7,13 @@ zoom_level = 4 ;
 gfp_channel_index = 0 ;
 background_channel_index = 1 ;
 
+intensity_threshold = 0.8 * 2^16 ;
+minimum_volume = 500 ;  % um^3
+%maximum_volume = 15000 ;  % um^3
+maximum_volume = 25000 ;  % um^3
+maximum_sqrt_condition_number = 10 ;
+
+
 render_parameters_file_path = fullfile(rendered_folder_path, 'calculated_parameters.jl') ;
 render_parameters = read_renderer_calculated_parameters_file(render_parameters_file_path) ;
 max_zoom_level = render_parameters.level_step_count ;
@@ -60,11 +67,6 @@ padded_substack_yxz = ...
 
 substack_mip = max(padded_substack_yxz,[], 3) ;
 
-intensity_threshold = 0.8 * 2^16 ;
-minimum_volume = 500 ;  % um^3
-%maximum_volume = 15000 ;  % um^3
-maximum_volume = 25000 ;  % um^3
-maximum_sqrt_condition_number = 10 ;
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
                     'maximum_volume', {maximum_volume}, ...

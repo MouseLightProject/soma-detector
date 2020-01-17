@@ -7,4 +7,10 @@ zoom_level = 4 ;
 gfp_channel_index = 0 ;
 background_channel_index = 1 ;
 
+intensity_threshold = 0.75 * 2^16 ;
+minimum_volume = 500 ;  % um^3
+%maximum_volume = 15000 ;  % um^3
+maximum_volume = 25000 ;  % um^3
+maximum_sqrt_condition_number = 10 ;
+
 debug_on_substack
