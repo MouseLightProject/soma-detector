@@ -32,9 +32,9 @@ function result = ...
       % don't get infinite condition numbers
     serial_voxel_indices = this_component_properties_as_struct.VoxelIdxList ;
     intensities = padded_substack_yxz(serial_voxel_indices) ;
-    max_intensity = max(intensities) ;
+    max_intensity = median(intensities) ;
     background_intensities = padded_background_substack_yxz(serial_voxel_indices) ;
-    max_background_intensity = max(background_intensities) ;
+    max_background_intensity = median(background_intensities) ;
     if voxel_count < 10 ,
         sqrt_condition_number = 1 ;
     else            
