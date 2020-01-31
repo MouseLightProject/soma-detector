@@ -20,7 +20,8 @@ intensity_threshold = 0.75 * 2^16 ;
 minimum_volume = 500 ;  % um^3
 %maximum_volume = 15000 ;  % um^3
 maximum_volume = 25000 ;  % um^3
-maximum_sqrt_condition_number = 10 ;
+%maximum_sqrt_condition_number = 10 ;
+maximum_sqrt_condition_number = 20 ;
 
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
@@ -148,7 +149,11 @@ max_background_intensity_from_candidate_index = [feature_struct_from_candidate_i
 
 
 % Load the ground-truth (these are all soma locations)
-xyz_from_target_index = load_soma_targets() ;
+[xyz_from_target_index, name_from_target_index] = load_traceable_soma_targets_from_tracers() ;
+% % Patch for bad G-040 soma
+% if norm(xyz_from_target_index(40,:)-[ 68289.340023  18112.354727  36828.363892 ]) < 1e-6 ,
+%     xyz_from_target_index(40,:) = [69232.8, 18467.3, 36351.0] ;
+% end
 target_count = size(xyz_from_target_index, 1) ;
 
 % Report the perf of the candidates
@@ -221,6 +226,7 @@ guess_count = length(feature_struct_from_guess_index) ;
 
 
 % Report the perf of the guesses
+matching_guess_index_from_target_index = ...
 print_performace_statistics_and_plot('guesses', ...
                                      xyz_from_target_index, ...
                                      feature_struct_from_guess_index, ...
@@ -372,17 +378,31 @@ grid on
 
 
 
-% % Save to a folder of .swc files
-% centroidoid_xyz_from_guess_index = reshape([feature_struct_from_guess_index(:).centroidoid_xyz], [3 guess_count])' ;
-% name_template = 'soma-prediction-%d' ;
-% output_folder_name = sprintf('%s-soma-predictions', sample_date) ;
-% if exist(output_folder_name, 'file') ,
-%     delete(fullfile(output_folder_name, '*')) ;
-% else
-%     mkdir(output_folder_name) ;
-% end
-% output_swc_file_name_template = sprintf('%s-soma-predictions/soma-prediction-%%d.swc', sample_date) ;
-% color = [1 0 1] ;
-% %save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
-% save_somata_as_multiple_swcs(output_swc_file_name_template, centroidoid_xyz_from_guess_index, name_template, color) ;
+%
+% Save to a folder of .swc files
+%
+output_folder_name = sprintf('%s-tracer-ground-truth-and-soma-predictions-take-2', sample_date) ;
+if exist(output_folder_name, 'file') ,
+    delete(fullfile(output_folder_name, '*')) ;
+else
+    mkdir(output_folder_name) ;
+end
+
+% output the predictions
+centroidoid_xyz_from_guess_index = reshape([feature_struct_from_guess_index(:).centroidoid_xyz], [3 guess_count])' ;
+name_template = 'soma-prediction-%d' ;
+output_swc_file_name_template = fullfile(output_folder_name, 'soma-prediction-%d.swc') ;
+color = [1 0 1] ;  % magenta
+%save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
+save_somata_as_multiple_swcs(output_swc_file_name_template, centroidoid_xyz_from_guess_index, name_template, color) ;
+
+% output the tracer GT somata
+output_swc_file_names = ...
+    cellfun(@(neuron_name)(fullfile(output_folder_name, [neuron_name '.swc'])), ...
+            name_from_target_index, ...
+            'UniformOutput', false) ;
+color = [31, 117, 254]/255 ;  % "crayola blue"
+%save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
+save_somata_as_multiple_swcs(output_swc_file_names, xyz_from_target_index, name_from_target_index, color) ;
+
 
