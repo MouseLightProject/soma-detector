@@ -7,14 +7,22 @@ function [matching_candidate_index_from_target_index, matching_target_index_from
                                              spacing_at_zoom_level_xyz, ...
                                              mip, ...
                                              mip_origin_xy, ...
+                                             mip_spacing_xy, ...
+                                             mip_clim, ...
                                              do_plot_candidates)
     %  heckbert_origin_xyz, stack_shape_xyz are for the full stack,
     %  regardless of what region the targets and components are drawn from
                                          
     is_there_a_mip = exist('mip', 'var') && ~isempty(mip) ;
-    if ~is_there_a_mip ,        
+    if is_there_a_mip ,        
+        if ~exist('mip_clim', 'var') || isempty(mip_clim) ;
+            mip_clim = [min(min(mip)) max(max(mip))] ;
+        end
+    else
         mip = [] ;
         mip_origin_xy = [] ;
+        mip_spacing_xy= [] ;
+        mip_clim = [] ;
     end
     
     if ~exist('do_plot_candidates', 'var') || isempty(do_plot_candidates) ,
@@ -54,13 +62,14 @@ function [matching_candidate_index_from_target_index, matching_target_index_from
     if is_there_a_mip ,
         mip_shape_ji = size(mip) ;
         mip_shape_ij = mip_shape_ji([2 1]) ;
-        mip_far_corner_xy = mip_origin_xy + spacing_at_zoom_level_xyz(1:2) .* (mip_shape_ij-1) ;
+        mip_far_corner_xy = mip_origin_xy + mip_spacing_xy .* (mip_shape_ij-1) ;
         image(a, 'CData', mip, ...
                  'XData', [mip_origin_xy(1) mip_far_corner_xy(1)], ...
                  'YData', [mip_origin_xy(2) mip_far_corner_xy(2)], ...
                  'CDataMapping', 'scaled') ;         
-        xlim([mip_origin_xy(1) mip_far_corner_xy(1)] + spacing_at_zoom_level_xyz(1)/2*[-1 +1]) ;
-        ylim([mip_origin_xy(2) mip_far_corner_xy(2)] + spacing_at_zoom_level_xyz(2)/2*[-1 +1]) ;
+        xlim([mip_origin_xy(1) mip_far_corner_xy(1)] + mip_spacing_xy(1)/2*[-1 +1]) ;
+        ylim([mip_origin_xy(2) mip_far_corner_xy(2)] + mip_spacing_xy(2)/2*[-1 +1]) ;
+        a.CLim = mip_clim ;
     end
     colormap(gray(256)) ;
     axis image    

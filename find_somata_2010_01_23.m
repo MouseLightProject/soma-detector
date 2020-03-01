@@ -1,11 +1,15 @@
+sample_date = '2020-01-23' ;
+tag = 'v1' ;
+output_folder_path = sprintf('/groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/%s/soma-predictions-%s', sample_date, tag) ;
+rendered_folder_path = sprintf('/nrs/mouselight/SAMPLES/%s', sample_date) ;
+
 do_force_computation = false ;
 do_use_bsub = true ;
 do_actually_submit = true ;
-bsub_options_template = '-P mouselight -n8 -eo find-somata-%d-%d-%d.stdouterr.txt -oo find-somata-%d-%d-%d.stdouterr.txt -W 59 -J find-somata' ;
+stdout_file_path_template = fullfile(output_folder_path, 'find-somata-%d-%d-%d.out.txt') ;
+bsub_options_template = ['-P mouselight -n8 -eo ' stdout_file_path_template ' -oo ' stdout_file_path_template ' -W 59 -J find-somata'] ;
 %bsub_options = '-P mouselight -n8 -eo /dev/null -oo /dev/null -W 59 -J find-somata' ;
 
-sample_date = '2019-10-04' ;
-rendered_folder_path = sprintf('/nrs/mouselight/SAMPLES/%s', sample_date) ;
 gfp_channel_index = 0 ;
 background_channel_index = 1 ;
 zoom_level = 4 ;  % The zoom level of the tiles we will analyze
@@ -28,9 +32,9 @@ parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'maximum_volume', {maximum_volume}, ...
                     'maximum_sqrt_condition_number', maximum_sqrt_condition_number) ;
                 
-this_file_path = mfilename('fullpath') ;
-this_folder_path = fileparts(this_file_path) ;                
-somata_folder_path = fullfile(this_folder_path, 'auto-somata') ;
+% this_file_path = mfilename('fullpath') ;
+% this_folder_path = fileparts(this_file_path) ;                
+% output_folder_path = fullfile(this_folder_path, sprintf('auto-somata-%s-%s', sample_date, tag)) ;
 
                 
 %[shape_xyz, origin_xyz, spacing_xyz] = load_sample_shape_origin_and_spacing(rendered_folder_path) ;
@@ -52,13 +56,13 @@ stack_shape_ijk = chunk_shape_ijk * 2^zoom_level ;  % the shape of the full-brai
 stack_shape_xyz = stack_shape_ijk .* spacing_at_zoom_level_xyz  % the shape of the full-brain stack in um, does not change with zoom level
 analysis_chunk_shape_ijk = 4*chunk_shape_ijk ;
 chunks_per_dimension_ijk = stack_shape_ijk ./ analysis_chunk_shape_ijk ;
-if ~exist(somata_folder_path, 'file') ,
-    mkdir(somata_folder_path) ;
-end
 if do_force_computation ,
-    system(sprintf('rm -rf %s/*', somata_folder_path)) ;
+    system(sprintf('rm -rf %s', output_folder_path)) ;
 end
-chunks_folder_path = fullfile(somata_folder_path, 'chunks') ;
+if ~exist(output_folder_path, 'file') ,
+    mkdir(output_folder_path) ;
+end
+chunks_folder_path = fullfile(output_folder_path, 'chunks') ;
 if ~exist(chunks_folder_path, 'file') ,
     mkdir(chunks_folder_path) ;
 end
@@ -139,14 +143,6 @@ sqrt_condition_number_from_candidate_index = [feature_struct_from_candidate_inde
 max_intensity_from_candidate_index = [feature_struct_from_candidate_index.max_intensity]' ;
 max_background_intensity_from_candidate_index = [feature_struct_from_candidate_index.max_background_intensity]' ;
 
-% %%
-% % Save as a .swc file, which can hold a forest, it turns out
-% forest_name = sprintf('%s-auto-somata', sample_date) ;
-% forest_color = [1 0 0] ;
-% swc_file_name = horzcat(forest_name, '.swc') ;
-% swc_file_path = fullfile(somata_folder_path, swc_file_name) ;
-% save_somata_as_single_swc(swc_file_path, xyz_from_guess_index, forest_name, forest_color) ;
-
 % Get a mip of the whole brain, for visualization
 overview_zoom_level = 2 ;
 stack_shape_at_overview_zoom_level_ijk = chunk_shape_ijk * 2^overview_zoom_level ;
@@ -159,11 +155,9 @@ mip_origin_xy = origin_at_overview_zoom_level_xyz(1:2) ;
 mip_spacing_xy = spacing_at_overview_zoom_level_xyz(1:2) ;
 
 % Load the ground-truth (these are all soma locations)
-[xyz_from_target_index, name_from_target_index] = load_traceable_soma_targets_from_tracers() ;
-% % Patch for bad G-040 soma
-% if norm(xyz_from_target_index(40,:)-[ 68289.340023  18112.354727  36828.363892 ]) < 1e-6 ,
-%     xyz_from_target_index(40,:) = [69232.8, 18467.3, 36351.0] ;
-% end
+%[xyz_from_target_index, name_from_target_index] = load_traceable_soma_targets_from_tracers() ;
+xyz_from_target_index = zeros(0,3) ;
+name_from_target_index = cell(0,1) ;
 target_count = size(xyz_from_target_index, 1) ;
 
 % Report the perf of the candidates
@@ -196,7 +190,22 @@ is_guess_from_candidate_index = ...
 feature_struct_from_guess_index = feature_struct_from_candidate_index(is_guess_from_candidate_index) ;
 guess_count = length(feature_struct_from_guess_index) ;
 
+% % Save auto-somata as a .swc file, which can hold a forest, it turns out
+% forest_name = sprintf('%s-%s-auto-somata', sample_date, tag) ;
+% forest_color = [1 0 0] ;
+% swc_file_name = horzcat(forest_name, '.swc') ;
+% swc_file_path = fullfile(output_folder_path, swc_file_name) ;
+% save_somata_as_single_swc(swc_file_path, xyz_from_guess_index, forest_name, forest_color) ;
+% save_somata_as_multiple_swcs(
 
+
+% output the predictions
+centroidoid_xyz_from_guess_index = reshape([feature_struct_from_guess_index(:).centroidoid_xyz], [3 guess_count])' ;
+name_template = 'soma-prediction-%d' ;
+output_swc_file_name_template = fullfile(output_folder_path, 'swcs', 'soma-prediction-%d.swc') ;
+color = [1 0 1] ;  % magenta
+%save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
+save_somata_as_multiple_swcs(output_swc_file_name_template, centroidoid_xyz_from_guess_index, name_template, color) ;
 
 
 % f = figure('color', 'w') ;
@@ -394,34 +403,5 @@ end
 legend(handles, legend_labels, 'Location', 'northwest') ;
 
 grid on
-
-
-
-%
-% Save to a folder of .swc files
-%
-output_folder_name = sprintf('%s-tracer-ground-truth-and-soma-predictions-take-2', sample_date) ;
-if exist(output_folder_name, 'file') ,
-    delete(fullfile(output_folder_name, '*')) ;
-else
-    mkdir(output_folder_name) ;
-end
-
-% output the predictions
-centroidoid_xyz_from_guess_index = reshape([feature_struct_from_guess_index(:).centroidoid_xyz], [3 guess_count])' ;
-name_template = 'soma-prediction-%d' ;
-output_swc_file_name_template = fullfile(output_folder_name, 'soma-prediction-%d.swc') ;
-color = [1 0 1] ;  % magenta
-%save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
-save_somata_as_multiple_swcs(output_swc_file_name_template, centroidoid_xyz_from_guess_index, name_template, color) ;
-
-% output the tracer GT somata
-output_swc_file_names = ...
-    cellfun(@(neuron_name)(fullfile(output_folder_name, [neuron_name '.swc'])), ...
-            name_from_target_index, ...
-            'UniformOutput', false) ;
-color = [31, 117, 254]/255 ;  % "crayola blue"
-%save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
-save_somata_as_multiple_swcs(output_swc_file_names, xyz_from_target_index, name_from_target_index, color) ;
 
 

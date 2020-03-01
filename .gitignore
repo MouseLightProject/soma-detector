@@ -4,6 +4,8 @@
 *.mj2
 *.h5
 *.pdf
+*.png
+*.ai
 auto-somata
 2019-10-04_adam_AT
 2019-10-04-somata-gt-*
@@ -12,3 +14,4 @@ find-somata*.stdouterr.txt
 2019-10-04-somata-predictions.swc
 2019-10-04-tracer-ground-truth-and-soma-predictions*
 ground-truth-traceable-somata-for-2019-10-04-from-monet*
+auto-somata-2020-01-23-*
