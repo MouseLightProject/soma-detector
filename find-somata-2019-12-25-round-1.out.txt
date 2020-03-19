@@ -1,0 +1,751 @@
+MATLAB is selecting SOFTWARE OPENGL rendering.
+Using 1 thread(s) on compute node.
+
+stack_shape_xyz =
+
+                  9152.168                  6985.644                 10755.018
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     1     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     1     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     1     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     1     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-1-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     2     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     2     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     2     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     2     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-2-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     3     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     3     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     3     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     3     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-3-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     4     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     4     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     4     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     1     4     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-1-4-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     1     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     1     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     1     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     1     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-1-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     2     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     2     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     2     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     2     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-2-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     3     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     3     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     3     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     3     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-3-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     4     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     4     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     4     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     2     4     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-2-4-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     1     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     1     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     1     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     1     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-1-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     2     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     2     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     2     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     2     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-2-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     3     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     3     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     3     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     3     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-3-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     4     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     4     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     4     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     3     4     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-3-4-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     1     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     1     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     1     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     1     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-1-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     2     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     2     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     2     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     2     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-2-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     3     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     3     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     3     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     3     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-3-4.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     4     1
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-1.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-1.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     4     2
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-2.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-2.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     4     3
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-3.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-3.out.txt -W 59 -J find-somata'
+
+
+chunk_offset_within_chunks_ijk1 =
+
+     4     4     4
+
+
+bsub_options =
+
+    '-P mouselight -n8 -eo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-4.out.txt -oo /groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/2019-12-25/soma-predictions-v1/find-somata-4-4-4.out.txt -W 59 -J find-somata'
+
+[                                                  ]:  0.0%[*                                                 ]:  1.6%[**                                                ]:  3.1%[**                                                ]:  4.7%[*****                                             ]: 10.9%[******                                            ]: 12.5%[*********                                         ]: 17.2%[**********                                        ]: 20.3%[***********                                       ]: 21.9%[***************                                   ]: 29.7%[******************                                ]: 35.9%[********************                              ]: 39.1%[***********************                           ]: 46.9%[***************************                       ]: 53.1%[********************************                  ]: 64.1%[***********************************               ]: 70.3%[**************************************            ]: 75.0%[****************************************          ]: 79.7%[*****************************************         ]: 81.3%[*****************************************         ]: 82.8%[******************************************        ]: 84.4%[*********************************************     ]: 89.1%[*********************************************     ]: 90.6%[***********************************************   ]: 93.8%[************************************************  ]: 95.3%[**************************************************]: 100.0%
+
+
+candidates:
+
+target_count =
+
+     0
+
+
+candidate_count =
+
+      601098
+
+
+hit_count =
+
+     0
+
+
+miss_count =
+
+     0
+
+
+chase_count =
+
+      601098
+
+
+recall =
+
+   NaN
+
+
+precision =
+
+     0
+
+[Warning: MATLAB has disabled some advanced graphics rendering features by
+switching to software OpenGL. For more information, click <a
+href="matlab:opengl('problems')">here</a>.] 
+
+
+
+minimum_volume_in_voxels =
+
+          88.3866584880886
+
+
+maximum_volume_in_voxels =
+
+          4419.33292440443
+
+{Error using fprintf
+Invalid file identifier. Use fopen to generate a valid file identifier.
+
+Error in save_somata_as_single_swc (line 21)
+    fprintf(fid, '# Generated by save_somata_as_single_swc.m\n') ;
+
+Error in save_somata_as_multiple_swcs (line 47)
+        save_somata_as_single_swc(file_name, soma_xyz, name, color) ;
+
+Error in find_somata_2019_12_25 (line 208)
+save_somata_as_multiple_swcs(output_swc_file_name_template,
+centroidoid_xyz_from_guess_index, name_template, color) ;
+} 
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@e10u32>
+Subject: Job 77707718: <find-somata-2019-12-25-round-1> in cluster <Janelia> Exited
+
+Job <find-somata-2019-12-25-round-1> was submitted from host <c11u25> by user <taylora> in cluster <Janelia> at Tue Mar 17 20:02:16 2020
+Job was executed on host(s) <e10u32>, in queue <cloud>, as user <taylora> in cluster <Janelia> at Tue Mar 17 20:02:16 2020
+</groups/scicompsoft/home/taylora> was used as the home directory.
+</groups/mousebrainmicro/mousebrainmicro/scripts/soma-detector> was used as the working directory.
+Started at Tue Mar 17 20:02:16 2020
+Terminated at Tue Mar 17 20:11:07 2020
+Results reported at Tue Mar 17 20:11:07 2020
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+/misc/local/matlab-2019a/bin/matlab -batch "modpath; find_somata_2019_12_25"
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   85.00 sec.
+    Max Memory :                                 7621 MB
+    Average Memory :                             871.46 MB
+    Total Requested Memory :                     15360.00 MB
+    Delta Memory :                               7739.00 MB
+    Max Swap :                                   -
+    Max Processes :                              7
+    Max Threads :                                35
+    Run time :                                   534 sec.
+    Turnaround time :                            531 sec.
+
+The output (if any) is above this job summary.
+
