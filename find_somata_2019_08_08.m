@@ -1,3 +1,32 @@
+sample_date = '2019-08-08' ;
+tag = 'v1' ;
+output_folder_path = sprintf('/groups/mousebrainmicro/mousebrainmicro/cluster/Reconstructions/%s/soma-predictions-%s', sample_date, tag) ;
+rendered_folder_path = sprintf('/nrs/mouselight/SAMPLES/%s', sample_date) ;
+
+do_force_computation = false ;
+do_use_bsub = false ;
+do_actually_submit = true ;
+stdout_file_path_template = fullfile(output_folder_path, 'find-somata-%d-%d-%d.out.txt') ;
+bsub_options_template = ['-P mouselight -n8 -eo ' stdout_file_path_template ' -oo ' stdout_file_path_template ' -W 59 -J find-somata'] ;
+%bsub_options = '-P mouselight -n8 -eo /dev/null -oo /dev/null -W 59 -J find-somata' ;
+
+gfp_channel_index = 0 ;
+background_channel_index = 1 ;
+zoom_level = 4 ;  % The zoom level of the tiles we will analyze
+pad_depth_in_um = 50 ; % um
+
+% intensity_threshold = 40000 ;
+% minimum_volume = 500 ;  % um^3
+% maximum_volume = 15000 ;  % um^3
+% maximum_sqrt_condition_number = 10 ;
+
+intensity_threshold = 0.75 * 2^16 ;
+minimum_volume = 500 ;  % um^3
+%maximum_volume = 15000 ;  % um^3
+maximum_volume = 25000 ;  % um^3
+%maximum_sqrt_condition_number = 10 ;
+maximum_sqrt_condition_number = 20 ;
+
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
                     'maximum_volume', {maximum_volume}, ...
@@ -56,7 +85,7 @@ for chunk_i = 1 : chunks_per_dimension_ijk(1) ,
                              @pad_and_find_candidate_somata_then_save, ...
                                  somata_mat_file_path, ...
                                  rendered_folder_path, ...
-                                 foreground_channel_index, ...
+                                 gfp_channel_index, ...
                                  background_channel_index, ...
                                  zoom_level, ...
                                  origin_at_zoom_level_xyz, ...
@@ -69,7 +98,7 @@ for chunk_i = 1 : chunks_per_dimension_ijk(1) ,
                     tic_id = tic() ;
                     pad_and_find_candidate_somata_then_save(somata_mat_file_path, ...
                                                             rendered_folder_path, ...
-                                                            foreground_channel_index, ...
+                                                            gfp_channel_index, ...
                                                             background_channel_index, ...
                                                             zoom_level, ...
                                                             origin_at_zoom_level_xyz, ...
@@ -120,7 +149,7 @@ stack_shape_at_overview_zoom_level_ijk = chunk_shape_ijk * 2^overview_zoom_level
 spacing_at_overview_zoom_level_xyz = spacing_at_zoom_level_0_xyz ./ (2^overview_zoom_level) ;
 origin_at_overview_zoom_level_xyz = heckbert_origin_xyz + spacing_at_overview_zoom_level_xyz/2 ;
 whole_brain_at_overview_zoom_level_yxz = ...
-   get_mouselight_rendered_substack(rendered_folder_path, foreground_channel_index, [1 1 1], stack_shape_at_overview_zoom_level_ijk, overview_zoom_level) ;  
+   get_mouselight_rendered_substack(rendered_folder_path, gfp_channel_index, [1 1 1], stack_shape_at_overview_zoom_level_ijk, overview_zoom_level) ;  
 overview_mip_yx = max(whole_brain_at_overview_zoom_level_yxz, [], 3) ;
 mip_origin_xy = origin_at_overview_zoom_level_xyz(1:2) ;
 mip_spacing_xy = spacing_at_overview_zoom_level_xyz(1:2) ;
@@ -153,18 +182,11 @@ volume_per_voxel = prod(spacing_at_zoom_level_xyz) ;
 minimum_volume_in_voxels = minimum_volume / volume_per_voxel
 maximum_volume_in_voxels = maximum_volume / volume_per_voxel
 
-does_satify_minimum_volume_criterion_from_candidate_index = (minimum_volume_in_voxels < voxel_count_from_candidate_index) ;
-does_satify_maximum_volume_criterion_from_candidate_index = (voxel_count_from_candidate_index < maximum_volume_in_voxels) ;
-does_satisfy_sqrt_cond_number_criterion_from_candidate_index = (sqrt_condition_number_from_candidate_index < maximum_sqrt_condition_number) ;
-does_satisy_background_intensity_criterion_from_candidate_index = (max_intensity_from_candidate_index > max_background_intensity_from_candidate_index) ;
-
-does_satisfy_criterion_from_candidate_index = ...
-  [ does_satify_minimum_volume_criterion_from_candidate_index ...
-    does_satify_maximum_volume_criterion_from_candidate_index ...
-    does_satisfy_sqrt_cond_number_criterion_from_candidate_index ...
-    does_satisy_background_intensity_criterion_from_candidate_index ] ;
-
-is_guess_from_candidate_index = all(does_satisfy_criterion_from_candidate_index, 2) ;
+is_guess_from_candidate_index = ...
+    (minimum_volume_in_voxels < voxel_count_from_candidate_index) & ...
+    (voxel_count_from_candidate_index < maximum_volume_in_voxels) & ...
+    sqrt_condition_number_from_candidate_index < maximum_sqrt_condition_number & ...
+    max_intensity_from_candidate_index > max_background_intensity_from_candidate_index ;
 feature_struct_from_guess_index = feature_struct_from_candidate_index(is_guess_from_candidate_index) ;
 guess_count = length(feature_struct_from_guess_index) ;
 
@@ -180,11 +202,11 @@ guess_count = length(feature_struct_from_guess_index) ;
 % output the predictions
 centroidoid_xyz_from_guess_index = reshape([feature_struct_from_guess_index(:).centroidoid_xyz], [3 guess_count])' ;
 name_template = 'soma-prediction-%d' ;
-swc_folder_path = fullfile(output_folder_path, 'swcs') ;
+output_swc_folder_path = fullfile(output_folder_path, 'swcs') ;
 output_swc_file_name_template = 'soma-prediction-%d.swc' ;
 color = [1 0 1] ;  % magenta
 %save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
-save_somata_as_multiple_swcs(swc_folder_path, output_swc_file_name_template, centroidoid_xyz_from_guess_index, name_template, color) ;
+save_somata_as_multiple_swcs(output_swc_folder_path, output_swc_file_name_template, centroidoid_xyz_from_guess_index, name_template, color) ;
 
 
 % f = figure('color', 'w') ;
@@ -240,8 +262,8 @@ save_somata_as_multiple_swcs(swc_folder_path, output_swc_file_name_template, cen
 %                                      mip_spacing_xy, ...
 %                                      mip_clim, ...
 %                                      do_plot_candidates) ;
-%                                  
-%                                  
+                                 
+                                 
 % %%                                 
 % % Considering just the cadidates, plot them in feature space, and
 % % characterize each as hit/miss/chase/ball.  This makes sense b/c we cast a wide net: every target is

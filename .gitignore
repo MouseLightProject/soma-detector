@@ -15,3 +15,4 @@ find-somata*.stdouterr.txt
 2019-10-04-tracer-ground-truth-and-soma-predictions*
 ground-truth-traceable-somata-for-2019-10-04-from-monet*
 auto-somata-2020-01-23-*
+*.out.txt
