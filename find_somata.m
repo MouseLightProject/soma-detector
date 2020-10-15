@@ -1,3 +1,7 @@
+
+
+
+
 parameters = struct('intensity_threshold', {intensity_threshold}, ...
                     'minimum_volume', {minimum_volume}, ...
                     'maximum_volume', {maximum_volume}, ...
@@ -179,12 +183,12 @@ guess_count = length(feature_struct_from_guess_index) ;
 
 % output the predictions
 centroidoid_xyz_from_guess_index = reshape([feature_struct_from_guess_index(:).centroidoid_xyz], [3 guess_count])' ;
-name_template = 'soma-prediction-%d' ;
+%name_template = 'soma-prediction-%d' ;
 swc_folder_path = fullfile(output_folder_path, 'swcs') ;
-output_swc_file_name_template = 'soma-prediction-%d.swc' ;
+%output_swc_file_name_template = 'soma-prediction-%d.swc' ;
 color = [1 0 1] ;  % magenta
 %save_somata_as_single_swc(output_swc_file_name, centroidoid_xyz_from_guess_index, name, color)
-save_somata_as_multiple_swcs(swc_folder_path, output_swc_file_name_template, centroidoid_xyz_from_guess_index, name_template, color) ;
+save_somata_as_multiple_swcs_with_auto_names(swc_folder_path, 'soma-prediction', centroidoid_xyz_from_guess_index, color) ;
 
 
 % f = figure('color', 'w') ;
