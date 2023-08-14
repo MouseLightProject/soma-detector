@@ -16,3 +16,4 @@ find-somata*.stdouterr.txt
 ground-truth-traceable-somata-for-2019-10-04-from-monet*
 auto-somata-2020-01-23-*
 *.out.txt
+*.out.round*.txt
